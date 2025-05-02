@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Prévisions Économiques du Cameroun</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleContact.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}" style="font-size: 12px;">Système intégré de surveillance, de prévision et de contrôle des risques économiques</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('previsions') }}">Recherche avancée</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('resultats') }}">Analyses</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container py-5">
+    <form action="" method="POST" id="contact-form">
+        <div class="form-group">
+            <label for="objet">Objet de la requête :</label>
+            <input type="text" class="form-control" name="objet" id="objet" placeholder="Sujet de votre message" required>
+            <span class="error text-danger" id="errorobjet"></span>
+        </div>
+        <div class="form-group">
+            <label for="message">Message :</label>
+            <textarea class="form-control" name="message" id="message" rows="5" required></textarea>
+            <span class="error text-danger" id="errormsg"></span>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </div>
+    </form>
+</main>
+
+<footer class="bg-dark text-white pt-4 pb-2">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Contact</h5>
+                <ul class="list-unstyled">
+                    <li><a href="mailto:abdelazizjunmbe@gmail.com" class="text-white">Email: abdelazizjunmbe@gmail.com</a></li>
+                    <li><a href="tel:+237698977560" class="text-white">Téléphone: +237 698 977 560</a></li>
+                    <li><span>Adresse: Immeuble Amakam, Rond Point Hilton</span></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Liens</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url_for('home') }}" class="text-white">Accueil</a></li>
+                    <li><a href="{{ url_for('previsions') }}" class="text-white">Recherche avancée</a></li>
+                    <li><a href="{{ url_for('resultats') }}" class="text-white">Analyses</a></li>
+                    <li><a href="{{ url_for('contact') }}" class="text-white">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>À propos de nous</h5>
+                <p>Système intégré de surveillance, de prévision et de contrôle des risques économiques.</p>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <p>&copy; 2025 Prévisions Économiques du Cameroun</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
+<script>
+    (function() {
+        const serviceId = 'service_9g5a8ss';
+        const templateId = 'template_9kk93bl';
+        const userId = '91qb2NKchSTMvjJg5';
+        const endpoint = 'https://api.emailjs.com/api/v1.0/email/send';
+
+        const currentUserName = "{{ session['username'] }}";
+        const currentUserEmail = "{{ session['email'] }}";
+    
+        function validate() {
+            const objet = document.getElementById('objet').value.trim();
+            const msg = document.getElementById('message').value.trim();
+    
+            let isValid = true;
+    
+            if (!objet) {
+                document.getElementById('errorobjet').innerText = "Veuillez entrer un objet";
+                isValid = false;
+            } else {
+                document.getElementById('errorobjet').innerText = "";
+            }
+    
+            if (!msg) {
+                document.getElementById('errormsg').innerText = "Veuillez entrer un message";
+                isValid = false;
+            } else {
+                document.getElementById('errormsg').innerText = "";
+            }
+    
+            return isValid;
+        }
+    
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!validate()) return;
+    
+            const templateParams = {
+                name: currentUserName,        // pris depuis session
+                email: currentUserEmail,      // pris depuis session
+                objet: document.getElementById('objet').value,
+                message: document.getElementById('message').value
+            };
+    
+            fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    service_id: serviceId,
+                    template_id: templateId,
+                    user_id: userId,
+                    template_params: templateParams
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`Erreur serveur: ${res.status}`);
+                return res.json();
+            })
+            .then(() => {
+                alert(`Merci ${currentUserName} pour votre message !`);
+                document.getElementById('contact-form').reset();
+            })
+            .catch(err => {
+                //console.error('Erreur EmailJS :', err);
+                //alert('Erreur lors de l\'envoi. Veuillez réessayer.');
+            });
+        });
+    })();
+    </script>
+        </body>
+</html>

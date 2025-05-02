@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des utilisateurs</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body style="font-family: 'Times New Roman', Times, serif; font-size: 16px;">
+<div class="container mt-5">
+    <h1>Utilisateurs enregistrés</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nom d'utilisateur</th>
+                <th>Email</th>
+                <th>Date d'enregistrement</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+    {% if user.created_at %}
+        {{ user.created_at.strftime("%d/%m/%Y %H:%M") }}
+    {% else %}
+        Date inconnue
+    {% endif %}
+</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('home') }}" class="btn btn-primary">Retour</a>
+</div>
+</body>
+</html>

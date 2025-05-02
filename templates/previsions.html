@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prévisions Économiques - Analyse</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/stylePrevisions.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .analysis-option-card { cursor: pointer; transition: transform 0.2s; }
+    .analysis-option-card:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('home') }}" style="font-size: 12px;">Système intégré de surveillance, de prévision et de contrôle des risques économiques</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Accueil</a></li>
+            <li class="nav-item active"><a class="nav-link" href="{{ url_for('previsions') }}">Recherche avancée</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('resultats') }}">Analyses</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="mt-4">
+    <section class="analysis-options">
+      <div class="container">
+        <h2 class="text-center mb-4">Choisissez votre méthode d'analyse</h2>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card analysis-option-card" onclick="showForm('document')">
+              <div class="card-body text-center">
+                <i class="fas fa-file-alt fa-3x mb-3"></i>
+                <h5 class="card-title">Analyse de Documents</h5>
+                <p class="card-text">Analysez des fichiers PDF ou texte pour extraire des informations clés.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="card analysis-option-card" onclick="showForm('site')">
+              <div class="card-body text-center">
+                <i class="fas fa-globe fa-3x mb-3"></i>
+                <h5 class="card-title">Analyse de Sites Web</h5>
+                <p class="card-text">Scrapez et analysez le contenu de sites web spécifiques.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="analysis-form-section">
+      <div class="container">
+        <h2 class="form-section-title text-center mb-4">Paramètres d'analyse</h2>
+        <form id="analyse-form" action="{{ url_for('analyser') }}" method="POST" enctype="multipart/form-data">
+          <input type="hidden" id="mode" name="mode" value="document">
+          <div id="form-documents" class="form-group">
+            <label for="document">Télécharger un document :</label>
+            <input type="file" class="form-control-file" id="document" name="document" accept=".pdf,.txt, .docx">
+          </div>
+
+          <div id="form-sites" class="form-group" style="display: none;">
+            <p><small>NB : Vous pouvez selectionner un site ou entrer une url, pas les deux à la fois.</small></p>
+
+            <label for="site">Choisir un site :</label>
+            <select class="form-control" id="site_select" name="site_select">
+              <option value="">-- Sélectionner un site --</option>
+              <option value="https://leconomie.info">economie.info</option>
+              <option value="https://cameroonceo.com">Cameroonceo</option>
+              <option value="https://afrique.latribune.fr/afrique-centrale/cameroun">Afrique la Tribune</option>
+              <option value="https://actucameroun.com">ActuCameroun</option>
+              <option value="https://cameroon-eco-business.info">Cameroon EcoBusiness</option>
+              <option value="https://minepat.gov.cm/fr">MINEPAT</option>
+              <option value="https://www.tresor.economie.gouv.fr/Pays/CM">Trésor Économie</option>
+              <option value="https://journal.rdpcp.cm">Journal RDPC</option>
+              <option value="https://www.agenceecofin.com/actualites">Agence Ecofin</option>
+              <option value="https://www.jeuneafrique.com">Jeune Afrique</option>
+            </select>
+            <input type="hidden" name="mode" value="site"><br>
+            <label for="site">Entrez l'URL à scraper :</label><br>
+            <input type="url" name="site_url" id="site_url" placeholder="https://www.exemple.com"  class="form-control"><br>
+           
+            <label for="annee">Annee</label>
+            <input type="text" name="annee" placeholder="Exemple : 2025" class="form-control">
+
+          </div>
+
+          <div class="form-group">
+            <label for="keywords">Mots-clés à rechercher :</label>
+            <input type="text" class="form-control" id="keywords" name="keywords" placeholder="Exemple : inflation, croissance">
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg" id="lancerAnalyseBtn">Lancer l'Analyse</button>
+            <div id="loadingIndicator" style="display:none; margin-top: 10px;">Cette opération peut prendre quelques minutes...</div>
+
+            <button type="button" class="btn btn-danger btn-lg ml-2" id="annulerAnalyseBtn" style="display: none;">Annuler</button>
+          </div>
+        </form>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-dark text-white pt-2 pb-1">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Contact</h5>
+                <ul class="list-unstyled">
+                  <li><a href="mailto:abdelazizjunmbe@gmail.com" class="text-white">Email: abdelazizjunmbe@gmail.com</a></li>
+                  <li><a href="tel:+237698977560" class="text-white">Téléphone: +237 698 977 560</a></li>
+                  <li><span class="text-white">Adresse: Immeuble Amakam, Rond Point Hilton</span></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Liens</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url_for('home') }}" class="text-white">Accueil</a></li>
+                    <li><a href="{{ url_for('previsions') }}" class="text-white">Recherche avancée</a></li>
+                    <li><a href="{{ url_for('resultats') }}" class="text-white">Analyses</a></li>
+                    <li><a href="{{ url_for('contact') }}" class="text-white">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>À propos de nous</h5>
+                <p>Système intégré de surveillance, de prévision et de contrôle des risques économiques.</p>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <p>&copy; 2023 Prévisions Économiques du Cameroun</p>
+        </div>
+    </div>
+    </footer>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="{{ url_for('static', filename='js/scriptPrevisions.js') }}"></script> 
+
+  <script>
+  </script>
+</body>
+</html>

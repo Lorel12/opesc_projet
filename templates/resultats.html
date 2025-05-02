@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Résultats de l'analyse</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleResultat.css') }}"> 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('home') }}" style="font-size: 12px;">Système intégré de surveillance, de prévision et de contrôle des risques économiques</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('home') }}">Accueil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('previsions') }}">Recherche avancée</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{{ url_for('resultats') }}">Analyses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="containerDiv">
+            <h1>Résultats de l'analyse</h1>
+        
+            {# Affichage d'une erreur si présente #}
+            {% if error_message %}
+              <div class="error">
+                <p>{{ error_message }}</p>
+              </div>
+            {% endif %}
+        
+            <div class="result-section">
+              <h2>Détails de l'analyse</h2>
+              <p><strong>Mode :</strong> {{ mode }}</p>
+              <p><strong>Mots-clés :</strong> {{ mots_cles }}</p>
+            </div>
+        
+            <div class="result-section">
+              <h2>Résultats trouvés</h2>
+              {% if resultats_analyse and resultats_analyse.items() %}
+                  {% for keyword, paragraphs in resultats_analyse.items() %}
+                      <div class="keyword-section">
+                          <h4>Mot-clé : "{{ keyword }}"</h4>
+                          {% for paragraph in paragraphs %}
+                              <div class="paragraph mb-4">
+                              {% if mode == "site" %} 
+                                  <small class="text-muted d-block mb-1">
+                                      <strong>Source :</strong> <a href="{{ paragraph.source }}" target="_blank">{{ paragraph.source }}</a><br>
+                                      <strong>Date :</strong> 
+                                      {% if paragraph.date != "Date inconnue" %}
+                                      {{ paragraph.date.strftime("%d/%m/%Y") }}
+                                      {% else %}
+                                      Date inconnue
+                                      {% endif %}
+                                  </small>
+                              {% endif %}
+                              <p>{{ paragraph.texte }}</p>
+                              </div>
+                          {% endfor %}
+                      </div>
+                  {% endfor %}        
+              {% else %}
+                <p>Aucun résultat n'a pu être généré.</p>
+              {% endif %}
+            </div>
+        
+            {# Affichage du graphique si l'URL est fournie #}
+            {% if graph_url %}
+              <div class="graph">
+                <h2>Graphique</h2>
+                <img src="{{ graph_url }}" alt="Graphique des résultats">
+              </div>
+            {% endif %}
+        
+            <div class="result-section">
+              <a href="{{ url_for('previsions') }}">Retour à l'accueil</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

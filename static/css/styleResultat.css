@@ -1,0 +1,91 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+}
+
+.containerDiv {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+}
+
+.result-section h2 {
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.result-section {
+    margin-bottom: 20px;
+}
+
+.keyword-section {
+    margin-bottom: 15px;
+}
+
+.keyword-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.paragraph {
+    border: 1px solid #eee;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    background-color: #fafafa;
+}
+
+.error {
+    color: red;
+    border: 1px solid red;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #ffecec;
+}
+
+.graph {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.navbar .container {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+    .containerDiv {
+        width: 90%; 
+        padding: 15px; 
+    }
+    /*on reduit les differentes tailles*/
+    h1 {
+        font-size: 24px; 
+    }
+
+    .result-section h2 {
+        font-size: 20px;
+    }
+
+    .keyword-title {
+        font-size: 18px; 
+    }
+
+    .paragraph {
+        font-size: 14px; 
+    }
+
+    .error, .graph {
+        font-size: 14px; 
+    }
+}
