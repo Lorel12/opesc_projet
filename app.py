@@ -6,13 +6,13 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg')  #Ajout obligatoire pour éviter les problèmes de backend graphique
+matplotlib.use('Agg')  
 import matplotlib.pyplot as plt
 import PyPDF2, docx
 from collections import defaultdict
 import os, json, sqlite3
 from werkzeug.utils import secure_filename
-from datetime import datetime, timezone
+from datetime import datetime
 from dateutil import parser
 
 user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -35,6 +35,15 @@ def init_db():
         email TEXT,
         created_at TIMESTAMP
     )''')
+    c.execute('''CREATE TABLE IF NOT EXISTS analyses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        mots_cles TEXT,
+        mode TEXT,
+        resultats TEXT,
+        graph_url TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')          
     conn.commit()
     conn.close()
 
@@ -56,7 +65,6 @@ def login():
         conn = get_db_connection()
         user = conn.execute('SELECT * FROM accounts WHERE username = ? AND password = ?', (username, hash_password)).fetchone()
         conn.close()
-
         if user:
             session['loggedin'] = True
             session['id'] = user['id']
@@ -77,7 +85,6 @@ def register():
 
         conn = get_db_connection()
         user = conn.execute('SELECT * FROM accounts WHERE username = ?', (username,)).fetchone()
-
         if user:
             msg = 'Ce nom d\'utilisateur existe déjà !'
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
@@ -123,7 +130,6 @@ def contact():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
 
-    # Récupérer l'email depuis la base
     """ 
     user = mongo.db.accounts.find_one(
        {'username': session['username']},
@@ -134,7 +140,7 @@ def contact():
     return render_template('contact.html',
                            username=session['username'], email=session.get('email', ''))
                            #email=session['email'])
-
+""" 
 @app.route('/resultats', methods=['GET', 'POST'])
 def resultats():
     if request.method == 'POST':
@@ -176,40 +182,44 @@ def resultats():
     mode = session.get('mode')
     mots_cles = session.get('mots_cles')
 
+    if 'last_analysis_id' in session:
+    conn = get_db_connection()
+    row = conn.execute('SELECT * FROM analyses WHERE id = ?', (session['last_analysis_id'],)).fetchone()
+    conn.close()
+    if row:
+        resultats_analyse = json.loads(row['resultats'])
+        mode = row['mode']
+        mots_cles = row['mots_cles']
+        graph_url = row['graph_url']
+
+
     if resultats_analyse is None:
         return render_template('resultats.html', error_message="Aucune analyse effectuée.")
     
     return render_template('resultats.html', resultats_analyse=resultats_analyse, mode=mode, mots_cles=mots_cles)
-
-@app.route('/analyser', methods=["POST"])
+    """
+@app.route('/analyser', methods=['POST'])
 def analyser():
     mode = request.form.get('mode')
     mots_cles = request.form.get('keywords')
-    analyse_result = None
-    error_message = None
+    analyse_result = {}
     graph_url = None
-
+    error_message = None
     try:
         if mode == 'document':
-            document = request.files.get('document')
-            if document:
-                filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(document.filename))
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                document.save(filename)
-                texte = extraction_du_texte(filename)
-                if texte:
-                    sentences = division_en_phrases(texte)
-                    analyse_result = recherche_mots_cles(sentences, mots_cles)
-                    # Extraction pour le graphique (on récupère les phrases trouvées)
-                    all_found_phrases = []
-                    for phrases_list in analyse_result.values():
-                        all_found_phrases.extend([item['texte'] for item in phrases_list])
-                    if all_found_phrases:
-                        graph_url = generate_graph(all_found_phrases, mots_cles)
-                else:
-                    error_message = "Erreur lors de la lecture du fichier."
-            else:
-                error_message = "Veuillez télécharger un document."
+            doc = request.files.get('document')
+            if not doc:
+                raise ValueError('Veuillez télécharger un document.')
+            path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(doc.filename))
+            doc.save(path)
+            
+            text = extraction_du_texte(path)
+            sentences = division_en_phrases(text)
+            analyse_result = recherche_mots_cles(sentences, mots_cles)
+           
+            phrases = [p['texte'] for lst in analyse_result.values() for p in lst]
+            if phrases:
+                graph_url = generate_graph(phrases, mots_cles)
         elif mode == 'site':
             site = request.form.get('site_url') or request.form.get('site_select')
             annee = request.form.get('annee')  
@@ -221,20 +231,36 @@ def analyser():
                 else:
                     analyse_result = analyse_site(site, mots_cles, annee)  
             else:
-                error_message = "Veuillez saisir une URL."
+                error_message = "Veuillez saisir une URL."        
         else:
-            error_message = "Mode d'analyse inconnu."
+            raise ValueError('Mode inconnu.')
     except Exception as e:
-        error_message = f"Une erreur inattendue s'est produite : {e}"
-        print(f"Erreur lors de l'analyse : {e}")
+        error_message = str(e)
+    # on sauvegarde
+    if 'id' in session:
+        conn = get_db_connection()
+        cur = conn.execute(
+            'INSERT INTO analyses (user_id, mots_cles, mode, resultats, graph_url) VALUES (?, ?, ?, ?, ?)',
+            (session['id'], mots_cles, mode, json.dumps(analyse_result), graph_url)
+        )
+        session['last_analysis_id'] = cur.lastrowid
+        conn.commit()
+        conn.close()
+    return render_template('resultats.html', resultats_analyse=analyse_result, mode=mode, mots_cles=mots_cles, graph_url=graph_url, error_message=error_message)
 
-    session['resultats_analyse'] = analyse_result
-    session['mode'] = mode
-    session['mots_cles'] = mots_cles
-    session['graph_url'] = graph_url
-    session['error_message'] = error_message
-
-    return render_template("resultats.html", mode=mode, mots_cles=mots_cles, resultats_analyse=analyse_result, graph_url=graph_url, error_message=error_message)  
+@app.route('/resultats')
+def resultats():
+    if 'last_analysis_id' in session:
+        conn = get_db_connection()
+        row = conn.execute('SELECT * FROM analyses WHERE id = ?', (session['last_analysis_id'],)).fetchone()
+        conn.close()
+        if row:
+            resultats_analyse = json.loads(row['resultats'])
+            mode = row['mode']
+            mots_cles = row['mots_cles']
+            graph_url = row['graph_url']
+            return render_template('resultats.html', resultats_analyse=resultats_analyse, mode=mode, mots_cles=mots_cles, graph_url=graph_url)
+    return render_template('resultats.html', error_message="Aucune analyse.")
 
 def extract_paragraphs_from_url(url):
     try:
@@ -256,10 +282,9 @@ def extract_paragraphs_from_url(url):
             if date_str:
                 date_str = date_str.replace('CEST', '').replace('CET', '').strip()
                 
-                # Ajoute un 'T' entre la date et l'heure 
+                # 'T' entre la date et l'heure 
                 if re.match(r'^\d{4}-\d{2}-\d{2}\d{2}:\d{2}:\d{2}', date_str):
-                    date_str = date_str[:10] + 'T' + date_str[10:]
-                
+                    date_str = date_str[:10] + 'T' + date_str[10:]                
                 date_obj = parser.parse(date_str)
             else:
                 date_obj = None
@@ -352,7 +377,7 @@ def extraction_du_texte(fichier):
             print("Format de fichier non supporté.")
             return None
     except Exception as e:
-        print(f"Erreur lors de l'extraction du texte depuis {fichier}: {e}")
+        #print(f"Erreur lors de l'extraction du texte depuis {fichier}: {e}")
         return None
     return text
 
