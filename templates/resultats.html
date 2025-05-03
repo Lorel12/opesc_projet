@@ -67,14 +67,16 @@
                               <div class="paragraph mb-4">
                               {% if mode == "site" %} 
                                   <small class="text-muted d-block mb-1">
-                                      <strong>Source :</strong> <a href="{{ paragraph.source }}" target="_blank">{{ paragraph.source }}</a><br>
-                                      <strong>Date :</strong> 
-                                      {% if paragraph.date %}
-                                      {{ paragraph.date.strftime("%d/%m/%Y") }}
-                                    {% else %}
-                                      Date inconnue
+                                    {% if paragraph.source %}
+                                        <strong>Source :</strong> <a href="{{ paragraph.source }}" target="_blank">{{ paragraph.source }}</a><br>
                                     {% endif %}
-                                  </small>
+                                    <strong>Date :</strong>
+                                    {% if paragraph.date %}
+                                        {{ paragraph.date.strftime("%d/%m/%Y") if paragraph.date is not string else paragraph.date }}
+                                    {% else %}
+                                        Date inconnue
+                                    {% endif %}
+                                </small>
                               {% endif %}
                               <p>{{ paragraph.texte }}</p>
                               </div>
