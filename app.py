@@ -386,5 +386,8 @@ def generate_graph(phrases, keywords):
     else:
         return None
 
-if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=5001)
+from waitress import serve
+
+if __name__ == "__main__":
+    PORT = int(os.environ.get("PORT", 10000))
+    serve(app, host="0.0.0.0", port=PORT)
