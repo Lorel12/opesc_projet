@@ -69,11 +69,11 @@
                                   <small class="text-muted d-block mb-1">
                                       <strong>Source :</strong> <a href="{{ paragraph.source }}" target="_blank">{{ paragraph.source }}</a><br>
                                       <strong>Date :</strong> 
-                                      {% if paragraph.date != "Date inconnue" %}
+                                      {% if paragraph.date %}
                                       {{ paragraph.date.strftime("%d/%m/%Y") }}
-                                      {% else %}
+                                    {% else %}
                                       Date inconnue
-                                      {% endif %}
+                                    {% endif %}
                                   </small>
                               {% endif %}
                               <p>{{ paragraph.texte }}</p>
