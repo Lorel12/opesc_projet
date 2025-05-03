@@ -130,6 +130,13 @@ def contact():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
 
+    """ 
+    user = mongo.db.accounts.find_one(
+       {'username': session['username']},
+       {'email': 1, '_id': 0}
+    ) 
+    #user_email = user.get('email','')
+    """
     return render_template('contact.html',
                            username=session['username'], email=session.get('email', ''))
                            #email=session['email'])
@@ -199,7 +206,10 @@ def analyser():
 
     session['analysis_id'] = analysis_id
     session['error_message'] = error_message
+
     return redirect(url_for('resultats'))
+
+from datetime import datetime
 
 @app.route('/resultats', methods=['GET'])
 def resultats():
@@ -217,8 +227,10 @@ def resultats():
     if not row:
         return render_template('resultats.html', error_message="Analyse introuvable.")
 
+    # 1) on recharge le JSON
     resultats_analyse = json.loads(row['resultats'])
-    # 'date' str → datetime
+
+    # 2) on reconvertit chaque champ 'date' str → datetime
     for kw, items in resultats_analyse.items():
         for item in items:
             d = item.get('date')
@@ -227,7 +239,7 @@ def resultats():
                     item['date'] = datetime.fromisoformat(d)
                 except ValueError:
                     item['date'] = None
-    # 3) on renvoie au template
+
     return render_template('resultats.html',
         resultats_analyse=resultats_analyse,
         mode      = row['mode'],
@@ -298,34 +310,40 @@ def extract_links_from_url(url):
         return []
 
 def analyse_site(url, keywords, annee=None):
+    from collections import defaultdict
+    from datetime import datetime
+
     resultat = defaultdict(list)
     keywords_list = [kw.strip().lower() for kw in keywords.split(',') if kw.strip()] if keywords else []
+
     try:
         print(f"Analyse de l'URL : {url}")
-        paragraphs_data = extract_paragraphs_from_url(url)
-        if annee:
-            paragraphs_data = [p for p in paragraphs_data if isinstance(p['date'], datetime) and p['date'].year == annee]
+        def process_paragraphs(paragraphs_data, source_url):
+            for p_data in paragraphs_data:
+                texte = p_data.get('texte', '').lower()
+                if annee:
+                    date = p_data.get('date')
+                    if not (isinstance(date, datetime) and date.year == annee):
+                        continue
+                for keyword in keywords_list:
+                    if keyword in texte:
+                        p_data.setdefault('source', source_url)
+                        p_data.setdefault('date', None)
+                        resultat[keyword].append(p_data)
 
-        for p_data in paragraphs_data:
-            for keyword in keywords_list:
-                if keyword in p_data['texte'].lower():
-                    resultat[keyword].append(p_data)
+        main_paragraphs = extract_paragraphs_from_url(url)
+        process_paragraphs(main_paragraphs, url)
 
         links = extract_links_from_url(url)
         for link in links:
-            paragraphs_data = extract_paragraphs_from_url(link)
-            if annee:
-                paragraphs_data = [p for p in paragraphs_data if isinstance(p['date'], datetime) and p['date'].year == annee]
-
-            for p_data in paragraphs_data:
-                for keyword in keywords_list:
-                    if keyword in p_data['texte'].lower():
-                        resultat[keyword].append(p_data)
+            link_paragraphs = extract_paragraphs_from_url(link)
+            process_paragraphs(link_paragraphs, link)
 
     except requests.exceptions.RequestException as e:
         return {"error": f"Erreur lors de l'accès à l'URL {url}: {e}"}
     except Exception as e:
         return {"error": f"Erreur inattendue lors de l'analyse de {url}: {e}"}
+    
     return dict(resultat)
 
 def extraction_du_texte(fichier):
@@ -394,6 +412,5 @@ def generate_graph(phrases, keywords):
         return url_for("static", filename="images/graph.png")
     else:
         return None
-
 if __name__ == "__main__":
     app.run(debug=True)
