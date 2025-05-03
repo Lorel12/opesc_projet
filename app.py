@@ -11,7 +11,7 @@ matplotlib.use('Agg')  #Ajout obligatoire pour éviter les problèmes de backend
 import matplotlib.pyplot as plt
 import PyPDF2, docx
 from collections import defaultdict
-import os, json
+import os, json, sqlite3
 from werkzeug.utils import secure_filename
 from datetime import datetime, timezone
 from dateutil import parser
@@ -21,79 +21,91 @@ headers = {"User-Agent": user_agent}
 
 app = Flask(__name__)
 app.secret_key = 'your secret key'
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/pythonlogin'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-mongo = PyMongo(app)
+
+DB_PATH = 'database.db'
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        email TEXT,
+        created_at TIMESTAMP
+    )''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+def get_db_connection():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
     msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+    if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         hash_password = hashlib.sha1((password + app.secret_key).encode()).hexdigest()
-        account = mongo.db.accounts.find_one({'username': username, 'password': hash_password})
-        print(account)
 
-        if account:
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM accounts WHERE username = ? AND password = ?', (username, hash_password)).fetchone()
+        conn.close()
+
+        if user:
             session['loggedin'] = True
-            session['id'] = str(account['_id'])
-            session['username'] = account['username']
-            session['email'] = account.get('email', '')
+            session['id'] = user['id']
+            session['username'] = user['username']
+            session['email'] = user['email']
             return redirect(url_for('home'))
         else:
-            msg = 'Mot de passe incorrect!'
+            msg = 'Mot de passe incorrect !'
     return render_template('login.html', msg=msg)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+    if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
 
-        account = mongo.db.accounts.find_one({'username': username})
-        if account:
-            msg = 'Ce nom d\'utilisateur existe déjà!'
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM accounts WHERE username = ?', (username,)).fetchone()
+
+        if user:
+            msg = 'Ce nom d\'utilisateur existe déjà !'
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-            msg = 'Adresse email invalide!'
+            msg = 'Adresse email invalide !'
         elif not re.match(r'[A-Za-z0-9]+', username):
-            msg = 'Le nom d\'utilisateur doit contenir uniquement des caractères alphanumériques!'
+            msg = 'Le nom d\'utilisateur doit contenir uniquement des caractères alphanumériques !'
         elif not username or not password or not email:
-            msg = 'Veuillez remplir tous les champs du formulaire!'
+            msg = 'Veuillez remplir tous les champs du formulaire !'
         else:
             hash_password = hashlib.sha1((password + app.secret_key).encode()).hexdigest()
-            mongo.db.accounts.insert_one({'username': username, 'password': hash_password, 'email': email, 'created_at': datetime.now(timezone.utc)
-})
-            msg = 'Enregistrement terminé avec succès!'
-    elif request.method == 'POST':
-        msg = 'Veuillez remplir tous les champs du formulaire!'
+            conn.execute('INSERT INTO accounts (username, password, email, created_at) VALUES (?, ?, ?, ?)',
+                         (username, hash_password, email, datetime.now()))
+            conn.commit()
+            conn.close()
+            msg = 'Enregistrement terminé avec succès !'
+            return redirect(url_for('login'))
+        conn.close()
     return render_template('register.html', msg=msg)
 
 @app.route('/users')
 def users():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
-
-    
-    users_cursor = mongo.db.accounts.find(
-        {},
-        {'password': 0}
-    ).sort('created_at', -1)
-
-    # Convertir en liste pour le template
-    users_list = []
-    for u in users_cursor:
-        
-        users_list.append({
-            'username': u['username'],
-            'email': u['email'],
-            'created_at': u.get('created_at')
-        })
-
-    return render_template('users.html', users=users_list)
+    conn = get_db_connection()
+    users = conn.execute('SELECT username, email, created_at FROM accounts ORDER BY created_at DESC').fetchall()
+    conn.close()
+    return render_template('users.html', users=users)
 
 @app.route('/home')
 def home():
