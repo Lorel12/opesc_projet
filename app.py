@@ -130,74 +130,10 @@ def contact():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
 
-    """ 
-    user = mongo.db.accounts.find_one(
-       {'username': session['username']},
-       {'email': 1, '_id': 0}
-    ) 
-    #user_email = user.get('email','')
-    """
     return render_template('contact.html',
                            username=session['username'], email=session.get('email', ''))
                            #email=session['email'])
-""" 
-@app.route('/resultats', methods=['GET', 'POST'])
-def resultats():
-    if request.method == 'POST':
-        mots_cles = request.form.get('mots_cles')  
-        mode = request.form.get('mode')
-        
-        resultats_analyse = {
-            "mot1": [{"texte": "Texte du résultat pour mot1", "source": "source1.com", "date": "2025-04-12"}],
-            "mot2": [{"texte": "Texte du résultat pour mot2", "source": "source2.com", "date": "2025-04-11"}]
-        }
-        
-        session['resultats_analyse'] = resultats_analyse
-        session['mode'] = mode
-        session['mots_cles'] = mots_cles
-        
-        return render_template('resultats.html', resultats_analyse=resultats_analyse, mode=mode, mots_cles=mots_cles)
 
-    if request.method == 'GET':
-
-        resultats_analyse = session.get('resultats_analyse')
-        mode = session.get('mode')
-        mots_cles = session.get('mots_cles')
-        graph_url = session.get('graph_url')
-        error_message = session.get('error_message')
-        
-        if resultats_analyse is None:
-            error_message = "Aucune analyse effectuée."
-        
-        return render_template('resultats.html', 
-                               resultats_analyse=resultats_analyse, 
-                               mode=mode, 
-                               mots_cles=mots_cles, 
-                               graph_url=graph_url, 
-                               error_message=error_message)
-    else:
-        pass
-
-    resultats_analyse = session.get('resultats_analyse')
-    mode = session.get('mode')
-    mots_cles = session.get('mots_cles')
-
-    if 'last_analysis_id' in session:
-    conn = get_db_connection()
-    row = conn.execute('SELECT * FROM analyses WHERE id = ?', (session['last_analysis_id'],)).fetchone()
-    conn.close()
-    if row:
-        resultats_analyse = json.loads(row['resultats'])
-        mode = row['mode']
-        mots_cles = row['mots_cles']
-        graph_url = row['graph_url']
-
-
-    if resultats_analyse is None:
-        return render_template('resultats.html', error_message="Aucune analyse effectuée.")
-    
-    return render_template('resultats.html', resultats_analyse=resultats_analyse, mode=mode, mots_cles=mots_cles)
-    """
 @app.route('/analyser', methods=['POST'])
 def analyser():
     mode = request.form.get('mode')
@@ -230,37 +166,74 @@ def analyser():
                     error_message = "Ce site ne semble pas être scrapable."
                 else:
                     analyse_result = analyse_site(site, mots_cles, annee)  
+                    phrases = [p['texte'] for lst in analyse_result.values() for p in lst]
+                    if phrases:
+                        graph_url = generate_graph(phrases, mots_cles)
             else:
                 error_message = "Veuillez saisir une URL."        
         else:
             raise ValueError('Mode inconnu.')
     except Exception as e:
         error_message = str(e)
-    # on sauvegarde
-    if 'id' in session:
-        conn = get_db_connection()
-        cur = conn.execute(
-            'INSERT INTO analyses (user_id, mots_cles, mode, resultats, graph_url) VALUES (?, ?, ?, ?, ?)',
-            (session['id'], mots_cles, mode, json.dumps(analyse_result), graph_url)
-        )
-        session['last_analysis_id'] = cur.lastrowid
-        conn.commit()
-        conn.close()
-    return render_template('resultats.html', resultats_analyse=analyse_result, mode=mode, mots_cles=mots_cles, graph_url=graph_url, error_message=error_message)
 
-@app.route('/resultats')
+    from datetime import datetime
+    for kw, items in analyse_result.items():
+        for item in items:
+            if isinstance(item.get('date'), datetime):
+                item['date'] = item['date'].isoformat()
+
+    conn = get_db_connection()
+    cur = conn.execute(
+            'INSERT INTO analyses (user_id,mots_cles,mode,resultats,graph_url) VALUES (?,?,?,?,?)',
+            (
+                session['id'],
+                mots_cles,
+                mode,
+                json.dumps(analyse_result, ensure_ascii=False),
+                graph_url
+            )
+        )
+    analysis_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+
+    session['analysis_id'] = analysis_id
+    session['error_message'] = error_message
+    return redirect(url_for('resultats'))
+
+@app.route('/resultats', methods=['GET'])
 def resultats():
-    if 'last_analysis_id' in session:
-        conn = get_db_connection()
-        row = conn.execute('SELECT * FROM analyses WHERE id = ?', (session['last_analysis_id'],)).fetchone()
-        conn.close()
-        if row:
-            resultats_analyse = json.loads(row['resultats'])
-            mode = row['mode']
-            mots_cles = row['mots_cles']
-            graph_url = row['graph_url']
-            return render_template('resultats.html', resultats_analyse=resultats_analyse, mode=mode, mots_cles=mots_cles, graph_url=graph_url)
-    return render_template('resultats.html', error_message="Aucune analyse.")
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    aid = session.get('analysis_id')
+    if not aid:
+        return render_template('resultats.html', error_message="Aucune analyse en session.")
+
+    conn = get_db_connection()
+    row = conn.execute('SELECT * FROM analyses WHERE id=?', (aid,)).fetchone()
+    conn.close()
+
+    if not row:
+        return render_template('resultats.html', error_message="Analyse introuvable.")
+
+    resultats_analyse = json.loads(row['resultats'])
+    # 'date' str → datetime
+    for kw, items in resultats_analyse.items():
+        for item in items:
+            d = item.get('date')
+            if isinstance(d, str):
+                try:
+                    item['date'] = datetime.fromisoformat(d)
+                except ValueError:
+                    item['date'] = None
+    # 3) on renvoie au template
+    return render_template('resultats.html',
+        resultats_analyse=resultats_analyse,
+        mode      = row['mode'],
+        mots_cles = row['mots_cles'],
+        graph_url = row['graph_url']
+    )
 
 def extract_paragraphs_from_url(url):
     try:
