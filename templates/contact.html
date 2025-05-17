@@ -41,12 +41,12 @@
 <main class="container py-5">
     <form action="" method="POST" id="contact-form">
         <div class="form-group">
-            <label for="objet">Objet de la requête :</label>
+            <label for="objet">Objet de la requête :</label>
             <input type="text" class="form-control" name="objet" id="objet" placeholder="Sujet de votre message" required>
             <span class="error text-danger" id="errorobjet"></span>
         </div>
         <div class="form-group">
-            <label for="message">Message :</label>
+            <label for="message">Message :</label>
             <textarea class="form-control" name="message" id="message" rows="5" required></textarea>
             <span class="error text-danger" id="errormsg"></span>
         </div>
@@ -132,8 +132,8 @@
             if (!validate()) return;
     
             const templateParams = {
-                name: currentUserName,        // pris depuis session
-                email: currentUserEmail,      // pris depuis session
+                name: currentUserName,
+                email: currentUserEmail,
                 objet: document.getElementById('objet').value,
                 message: document.getElementById('message').value
             };
@@ -153,15 +153,19 @@
                 return res.json();
             })
             .then(() => {
-                alert(`Merci ${currentUserName} pour votre message !`);
+                // Message envoyé avec succès : on efface le formulaire
                 document.getElementById('contact-form').reset();
+                document.getElementById('errorobjet').innerText = "";
+                document.getElementById('errormsg').innerText = "";
+                alert(`Merci ${currentUserName} pour votre message !`);
             })
             .catch(err => {
-                //console.error('Erreur EmailJS :', err);
-                //alert('Erreur lors de l\'envoi. Veuillez réessayer.');
+                console.error('Erreur EmailJS :', err);
+                // Affichage d'un message d'erreur si l'envoi échoue
+                document.getElementById('errormsg').innerText = "Erreur lors de l'envoi. Veuillez réessayer.";
             });
         });
     })();
-    </script>
-        </body>
+</script>
+</body>
 </html>
