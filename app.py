@@ -19,6 +19,8 @@ from dateutil import parser
 from utils import extraction_du_texte, division_en_phrases, recherche_mots_cles
 from scraper import extract_paragraphs_from_url, extract_links_from_url, analyse_site
 from graph import generate_graph
+from database import init_db, get_db_connection
+
 
 user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 headers = {"User-Agent": user_agent}
@@ -28,36 +30,6 @@ app.secret_key = 'your secret key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-DB_PATH = 'database.db'
-
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS accounts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        email TEXT,
-        created_at TIMESTAMP
-    )''')
-    c.execute('''CREATE TABLE IF NOT EXISTS analyses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        mots_cles TEXT,
-        mode TEXT,
-        resultats TEXT,
-        graph_url TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')          
-    conn.commit()
-    conn.close()
-
-init_db()
-
-def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
