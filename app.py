@@ -249,7 +249,7 @@ def resultats():
 
 def extract_paragraphs_from_url(url):
     try:
-        response = requests.get(url)#, timeout=20)
+        response = requests.get(url, timeout=20)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
         paragraphs_data = []
@@ -292,7 +292,7 @@ def extract_paragraphs_from_url(url):
         
 def extract_links_from_url(url):
     try:
-        response = requests.get(url, headers=headers)#, timeout=30)
+        response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
         links = set()
