@@ -8,12 +8,24 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleContact.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        @media (max-width: 768px) {
+            .navbar-brand {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 70%;
+            }
+        }
+    </style>
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark d-flex justify-content-between">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}" style="font-size: 12px;">Système intégré de surveillance, de prévision et de contrôle des risques économiques</a>
+            <a class="navbar-brand text-truncate" href="{{ url_for('home') }}" style="font-size: 12px; max-width: 70%;">
+                Système intégré de surveillance, de prévision et de contrôle des risques économiques
+            </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
