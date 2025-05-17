@@ -85,12 +85,13 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 <!-- EmailJS SDK v4 -->
-<script type="text/javascript" src="https://cdn.emailjs.com/sdk/v4/email.min.js"></script>
+<script type="text/javascript" src="https://cdn.emailjs.com/sdk/4.6.0/email.min.js"></script>
 <script>
     (function() {
         const serviceId = 'service_9g5a8ss';
         const templateId = 'template_9kk93bl';
         const userId = '91qb2NKchSTMvjJg5';
+        // Initialisation de l'objet emailjs fourni par le SDK
         emailjs.init(userId);
 
         const currentUserName = "{{ session['username'] }}";
@@ -127,13 +128,13 @@
             };
 
             emailjs.send(serviceId, templateId, templateParams)
-                .then(() => {
+                .then(function() {
                     document.getElementById('contact-form').reset();
                     document.getElementById('errorobjet').innerText = "";
                     document.getElementById('errormsg').innerText = "";
                     alert(`Merci ${currentUserName} pour votre message !`);
                 })
-                .catch((err) => {
+                .catch(function(err) {
                     console.log('Erreur EmailJS :', err);
                     document.getElementById('errormsg').innerText = "Erreur lors de l'envoi. Veuillez réessayer.";
                 });
