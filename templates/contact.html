@@ -132,8 +132,9 @@
                     document.getElementById('errorobjet').innerText = "";
                     document.getElementById('errormsg').innerText = "";
                     alert(`Merci ${currentUserName} pour votre message !`);
-                }, (err) => {
-                    console.error('Erreur EmailJS :', err);
+                })
+                .catch((err) => {
+                    console.log('Erreur EmailJS :', err);
                     document.getElementById('errormsg').innerText = "Erreur lors de l'envoi. Veuillez réessayer.";
                 });
         });
