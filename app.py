@@ -30,6 +30,7 @@ app.secret_key = 'your secret key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+init_db()
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
