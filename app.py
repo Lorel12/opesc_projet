@@ -291,27 +291,5 @@ def recherche_mots_cles(sentences, keywords):
         results[keyword] = found
     return results
 
-def generate_graph(phrases, keywords):
-    keywords_list = [kw.strip().lower() for kw in keywords.split(',') if kw.strip()]
-    counts = {kw: 0 for kw in keywords_list}
-    for phrase in phrases:
-        lower_phrase = phrase.lower()
-        for kw in keywords_list:
-            counts[kw] += lower_phrase.count(kw)
-    df = pd.DataFrame(list(counts.items()), columns=["Mot clé", "Fréquence"])
-    if not df.empty:
-        plt.figure(figsize=(8, 6))
-        plt.bar(df["Mot clé"], df["Fréquence"], color="skyblue")
-        plt.title("Fréquence des mots clés")
-        plt.xlabel("Mot clé")
-        plt.ylabel("Fréquence")
-        img_path = os.path.join("static", "images")
-        os.makedirs(img_path, exist_ok=True)
-        graph_file = os.path.join(img_path, "graph.png")
-        plt.savefig(graph_file)
-        plt.close()
-        return url_for("static", filename="images/graph.png")
-    else:
-        return None
 if __name__ == "__main__":
     app.run(debug=True)
