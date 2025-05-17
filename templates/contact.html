@@ -13,25 +13,17 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}" style="font-size: 12px;">Système intégré de surveillance, de prévision et de contrôle des risques économiques</a>
+            <a class="navbar-brand" href="{{ url_for('home') }}" style="font-size: 12px;">Système intégré de surveillance, de prévision et de contrôle des risques économiques</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home') }}">Accueil</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('previsions') }}">Recherche avancée</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('resultats') }}">Analyses</a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('previsions') }}">Recherche avancée</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('resultats') }}">Analyses</a></li>
+                    <li class="nav-item active"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
                 </ul>
             </div>
         </div>
@@ -41,12 +33,12 @@
 <main class="container py-5">
     <form action="" method="POST" id="contact-form">
         <div class="form-group">
-            <label for="objet">Objet de la requête :</label>
+            <label for="objet">Objet de la requête :</label>
             <input type="text" class="form-control" name="objet" id="objet" placeholder="Sujet de votre message" required>
             <span class="error text-danger" id="errorobjet"></span>
         </div>
         <div class="form-group">
-            <label for="message">Message :</label>
+            <label for="message">Message :</label>
             <textarea class="form-control" name="message" id="message" rows="5" required></textarea>
             <span class="error text-danger" id="errormsg"></span>
         </div>
@@ -78,7 +70,7 @@
             </div>
             <div class="col-md-4">
                 <h5>À propos de nous</h5>
-                <p>Système intégré de surveillance, de prévision et de contrôle des risques économiques.</p>
+                <p>Système intégré de surveillance, de prévision et de contrôle des risques économiques.</p>
             </div>
         </div>
         <div class="text-center mt-4">
@@ -92,78 +84,58 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-
+<!-- EmailJS SDK v4 -->
+<script type="text/javascript" src="https://cdn.emailjs.com/sdk/v4/email.min.js"></script>
 <script>
     (function() {
         const serviceId = 'service_9g5a8ss';
         const templateId = 'template_9kk93bl';
         const userId = '91qb2NKchSTMvjJg5';
-        const endpoint = 'https://api.emailjs.com/api/v1.0/email/send';
+        emailjs.init(userId);
 
         const currentUserName = "{{ session['username'] }}";
         const currentUserEmail = "{{ session['email'] }}";
-    
+
         function validate() {
             const objet = document.getElementById('objet').value.trim();
             const msg = document.getElementById('message').value.trim();
-    
             let isValid = true;
-    
             if (!objet) {
                 document.getElementById('errorobjet').innerText = "Veuillez entrer un objet";
                 isValid = false;
             } else {
                 document.getElementById('errorobjet').innerText = "";
             }
-    
             if (!msg) {
                 document.getElementById('errormsg').innerText = "Veuillez entrer un message";
                 isValid = false;
             } else {
                 document.getElementById('errormsg').innerText = "";
             }
-    
             return isValid;
         }
-    
+
         document.getElementById('contact-form').addEventListener('submit', function(e) {
             e.preventDefault();
             if (!validate()) return;
-    
+
             const templateParams = {
                 name: currentUserName,
                 email: currentUserEmail,
                 objet: document.getElementById('objet').value,
                 message: document.getElementById('message').value
             };
-    
-            fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    service_id: serviceId,
-                    template_id: templateId,
-                    user_id: userId,
-                    template_params: templateParams
-                })
-            })
-            .then(res => {
-                if (!res.ok) throw new Error(`Erreur serveur: ${res.status}`);
-                return res.json();
-            })
-            .then(() => {
-                // Message envoyé avec succès : on efface le formulaire
-                document.getElementById('contact-form').reset();
-                document.getElementById('errorobjet').innerText = "";
-                document.getElementById('errormsg').innerText = "";
-                alert(`Merci ${currentUserName} pour votre message !`);
-            })
-            .catch(err => {
-                console.error('Erreur EmailJS :', err);
-                // Affichage d'un message d'erreur si l'envoi échoue
-                document.getElementById('errormsg').innerText = "Erreur lors de l'envoi. Veuillez réessayer.";
-            });
+
+            emailjs.send(serviceId, templateId, templateParams)
+                .then(() => {
+                    document.getElementById('contact-form').reset();
+                    document.getElementById('errorobjet').innerText = "";
+                    document.getElementById('errormsg').innerText = "";
+                    alert(`Merci ${currentUserName} pour votre message !`);
+                }, (err) => {
+                    console.error('Erreur EmailJS :', err);
+                    document.getElementById('errormsg').innerText = "Erreur lors de l'envoi. Veuillez réessayer.";
+                });
         });
     })();
 </script>
