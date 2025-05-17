@@ -1,3 +1,6 @@
+import sqlite3
+import os
+
 DB_PATH = 'database.db'
 
 def init_db():
