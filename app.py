@@ -1,4 +1,4 @@
-"""
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import hashlib
 import re
@@ -15,7 +15,7 @@ import os, json, sqlite3
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from dateutil import parser
-"""
+
 from utils import extraction_du_texte, division_en_phrases, recherche_mots_cles
 from scraper import extract_paragraphs_from_url, extract_links_from_url, analyse_site
 from graph import generate_graph
