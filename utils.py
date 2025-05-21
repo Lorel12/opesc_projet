@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')  
 import matplotlib.pyplot as plt
-import PyPDF2, docx
+import docx
 from collections import defaultdict
 import os, json, sqlite3
 from werkzeug.utils import secure_filename
@@ -24,14 +24,14 @@ def extraction_du_texte(fichier):
     try:
         if extension == ".pdf":
             with pdfplumber.open(fichier) as pdf:
-                max_pages = 5  # Tu peux augmenter ce nombre si Render supporte
+                max_pages = 5  # Pour limiter le temps sur Render
                 for i, page in enumerate(pdf.pages[:max_pages]):
                     try:
                         page_text = page.extract_text()
                         if page_text:
                             text += page_text + "\n"
                     except Exception as e:
-                        print(f"Erreur à la page {i}: {e}")
+                        print(f"Erreur page {i}: {e}")
                         continue
         elif extension == ".docx":
             doc = docx.Document(fichier)
@@ -41,12 +41,13 @@ def extraction_du_texte(fichier):
             with open(fichier, "r", encoding="utf-8") as f:
                 text = f.read()
         else:
-            print("Format de fichier non supporté.")
+            print("Format non supporté.")
             return None
     except Exception as e:
-        print(f"Erreur lors de l'extraction du texte depuis {fichier}: {e}")
+        print(f"Erreur globale: {e}")
         return None
     return text
+
 
 
 def division_en_phrases(text):
