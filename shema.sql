@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS analyses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    mots_cles TEXT,
+    mode TEXT,
+    resultats TEXT,
+    graph_url TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
