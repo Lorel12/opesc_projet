@@ -106,7 +106,7 @@ def analyse_site(url, keywords, annee=None):
         process_paragraphs(main_paragraphs, url)
 
         links = extract_links_from_url(url)
-        for link in links:
+        for link in links[:10]:
             link_paragraphs = extract_paragraphs_from_url(link)
             process_paragraphs(link_paragraphs, link)
 
