@@ -14,21 +14,25 @@ import os, json, sqlite3
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from dateutil import parser
-
+import pdfplumber
 user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-headers = {"User-Agent": user_agent}
+headers = {"User-Agent": user_agent}  
 
 def extraction_du_texte(fichier):
     extension = os.path.splitext(fichier)[1].lower()
     text = ""
     try:
         if extension == ".pdf":
-            with open(fichier, "rb") as f:
-                reader = PyPDF2.PdfReader(f)
-                for page in reader.pages:
-                    page_text = page.extract_text()
-                    if page_text:
-                        text += page_text + "\n"
+            with pdfplumber.open(fichier) as pdf:
+                max_pages = 5  # Tu peux augmenter ce nombre si Render supporte
+                for i, page in enumerate(pdf.pages[:max_pages]):
+                    try:
+                        page_text = page.extract_text()
+                        if page_text:
+                            text += page_text + "\n"
+                    except Exception as e:
+                        print(f"Erreur à la page {i}: {e}")
+                        continue
         elif extension == ".docx":
             doc = docx.Document(fichier)
             for para in doc.paragraphs:
@@ -40,9 +44,10 @@ def extraction_du_texte(fichier):
             print("Format de fichier non supporté.")
             return None
     except Exception as e:
-        #print(f"Erreur lors de l'extraction du texte depuis {fichier}: {e}")
+        print(f"Erreur lors de l'extraction du texte depuis {fichier}: {e}")
         return None
     return text
+
 
 def division_en_phrases(text):
     if not text:
