@@ -233,8 +233,8 @@ def resultats():
                                mode=None,
                                mots_cles=None,
                                graph_url=None,
-                               pagination=None,
-                               error_message="Analyse introuvable. Veuillez d'abord effectuer une analyse.")
+                               pagination=pagination),
+                               #error_message="Analyse introuvable. Veuillez d'abord effectuer une analyse.")
 
     results = session['results']
     mode = session.get('mode', 'inconnu')
