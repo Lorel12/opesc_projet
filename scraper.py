@@ -59,11 +59,23 @@ def extract_paragraphs_from_url(url):
     if not can_scrape(url):
         print(f"[robots.txt] Scraping interdit pour {url}")
         return []  # On ne scrape pas les URL interdites
-
+     
     try:
         response = requests.get(url, headers=headers, timeout=20)
         response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
+
+        content_type = response.headers.get('Content-Type', '')
+        if 'html' not in content_type:
+            print(f"[Info] URL non HTML ignorée : {url} (Content-Type: {content_type})")
+            return []
+
+        try:
+            soup = BeautifulSoup(response.content, 'html.parser')
+
+        except Exception as e:
+            print(f"[Erreur parsing HTML] {url} : {e}")
+            return []
+            
         paragraphs_data = []
 
         # Tentative de récupération de la date de publication
