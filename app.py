@@ -187,7 +187,6 @@ def analyser():
 
     return redirect(url_for('resultats'))
 
-from datetime import datetime
 """
 @app.route('/resultats', methods=['GET'])
 def resultats():
@@ -227,13 +226,41 @@ def resultats():
 """
 @app.route('/resultats', methods=['GET'])
 def resultats():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    aid = session.get('analysis_id')
+    if not aid:
+        return render_template('resultats.html', error_message="Aucune analyse en session.")
+
+    conn = get_db_connection()
+    row = conn.execute('SELECT * FROM analyses WHERE id=?', (aid,)).fetchone()
+    conn.close()
+
+    if not row:
+        return render_template('resultats.html', error_message="Analyse introuvable.")
+
+    # 1) Recharger le JSON
+    resultats_analyse = json.loads(row['resultats'])
+
+    # 2) Reconversion champ 'date' : str → datetime
+    for kw, items in resultats_analyse.items():
+        for item in items:
+            d = item.get('date')
+            if isinstance(d, str):
+                try:
+                    item['date'] = datetime.fromisoformat(d)
+                except ValueError:
+                    item['date'] = None
+
+    # 3) Récupération des éléments de session
     paragraphs = session.get('paragraphs', [])
     keywords = session.get('keywords', [])
     source = session.get('source', '')
     date = session.get('date', '')
     type_analyse = session.get('type_analyse', '')
 
-    # Paramètres de pagination
+    # 4) Pagination
     page = request.args.get('page', 1, type=int)
     per_page = 10
     total = len(paragraphs)
@@ -252,7 +279,6 @@ def resultats():
             'has_next': page < total_pages
         }
     else:
-        # Même si aucun résultat, on initialise pagination pour éviter l'erreur
         paginated_paragraphs = []
         pagination = {
             'page': 1,
@@ -264,6 +290,10 @@ def resultats():
 
     return render_template(
         'resultats.html',
+        resultats_analyse=resultats_analyse,
+        mode=row['mode'],
+        mots_cles=row['mots_cles'],
+        graph_url=row['graph_url'],
         paragraphs=paginated_paragraphs,
         keywords=keywords,
         source=source,
