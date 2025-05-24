@@ -225,50 +225,53 @@ def resultats():
         graph_url = row['graph_url']
     )
 """
-@app.route('/resultats')
+@app.route('/resultats', methods=['GET'])
 def resultats():
-    if 'results' not in session:
-        return render_template('resultats.html',
-                               current_results=None,
-                               mode=None,
-                               mots_cles=None,
-                               graph_url=None,
-                               pagination=pagination),
-                               #error_message="Analyse introuvable. Veuillez d'abord effectuer une analyse.")
+    # ... récupération des données analysées ou depuis session
 
-    results = session['results']
-    mode = session.get('mode', 'inconnu')
-    mots_cles = session.get('mots_cles', [])
-    graph_url = session.get('graph_url')
+    paragraphs = session.get('paragraphs', [])
+    keywords = session.get('keywords', [])
+    source = session.get('source', '')
+    date = session.get('date', '')
+    type_analyse = session.get('type_analyse', '')
 
-    current_page = int(request.args.get('page', 1))
+    # Pagination : nombre total de paragraphes et calcul des pages
+    page = request.args.get('page', 1, type=int)
     per_page = 10
-    total = len(results)
-    total_pages = max(1, (total + per_page - 1) // per_page)
+    total = len(paragraphs)
 
-    if current_page < 1 or current_page > total_pages:
-        current_page = 1
+    if total > 0:
+        total_pages = (total + per_page - 1) // per_page
+        start = (page - 1) * per_page
+        end = start + per_page
+        paginated_paragraphs = paragraphs[start:end]
 
-    start = (current_page - 1) * per_page
-    end = start + per_page
-    current_results = results[start:end]
+        pagination = {
+            'page': page,
+            'per_page': per_page,
+            'total_pages': total_pages,
+            'has_prev': page > 1,
+            'has_next': page < total_pages
+        }
+    else:
+        paginated_paragraphs = []
+        pagination = {
+            'page': 1,
+            'per_page': 10,
+            'total_pages': 1,
+            'has_prev': False,
+            'has_next': False
+        }
 
-    pagination = {
-        'current_page': current_page,
-        'total_pages': total_pages,
-        'has_prev': current_page > 1,
-        'has_next': current_page < total_pages,
-        'prev_num': current_page - 1,
-        'next_num': current_page + 1
-    }
-
-    return render_template('resultats.html',
-                           current_results=current_results,
-                           mode=mode,
-                           mots_cles=mots_cles,
-                           graph_url=graph_url,
-                           pagination=pagination,
-                           error_message=None)
+    return render_template(
+        'resultats.html',
+        paragraphs=paginated_paragraphs,
+        keywords=keywords,
+        source=source,
+        date=date,
+        type_analyse=type_analyse,
+        pagination=pagination
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
