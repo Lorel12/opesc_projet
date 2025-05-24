@@ -191,7 +191,8 @@ def analyser():
             paragraphs.append({
                 'texte': item.get('texte'),
                 'source': item.get('source', ''),
-                'date': item.get('date')
+                'date': item.get('date'), 
+                'keyword': kw 
             })
     
     # Stocker les infos nécessaires dans la session
