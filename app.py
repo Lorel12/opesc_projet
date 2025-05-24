@@ -161,7 +161,6 @@ def analyser():
     except Exception as e:
         error_message = str(e)
 
-    from datetime import datetime
     for kw, items in analyse_result.items():
         for item in items:
             if isinstance(item.get('date'), datetime):
@@ -186,13 +185,13 @@ def analyser():
     session['error_message'] = error_message
     # Extraire les paragraphes pour affichage paginé
     paragraphs = []
-    for kw, items in analyse_result.items():
+    for keyword, items in analyse_result.items():
         for item in items:
             paragraphs.append({
                 'texte': item.get('texte'),
                 'source': item.get('source', ''),
                 'date': item.get('date'), 
-                'keyword': kw 
+                'keyword': keyword 
             })
     
     # Stocker les infos nécessaires dans la session
