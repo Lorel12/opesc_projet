@@ -235,17 +235,16 @@ def resultats():
                                graph_url=None,
                                pagination=None,
                                error_message="Analyse introuvable. Veuillez d'abord effectuer une analyse.")
-    
+
     results = session['results']
     mode = session.get('mode', 'inconnu')
     mots_cles = session.get('mots_cles', [])
     graph_url = session.get('graph_url')
 
-    # Pagination
     current_page = int(request.args.get('page', 1))
     per_page = 10
     total = len(results)
-    total_pages = (total + per_page - 1) // per_page
+    total_pages = max(1, (total + per_page - 1) // per_page)
 
     if current_page < 1 or current_page > total_pages:
         current_page = 1
