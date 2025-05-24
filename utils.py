@@ -95,7 +95,8 @@ def recherche_mots_cles(sentences, keywords):
             if re.search(rf'\b{re.escape(keyword_lower)}\b', sentence, re.IGNORECASE):
                 found.append({
                     "texte": sentence,
-                    "date": now
+                    "date": now,
+                    "keyword": keyword
                 })
         results[keyword] = found
 
