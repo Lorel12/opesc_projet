@@ -15,18 +15,51 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from dateutil import parser
 
-# User-Agent utilisé pour éviter les blocages par certains sites
+import urllib.robotparser
+from urllib.parse import urlparse
 
+# User-Agent utilisé pour éviter les blocages par certains sites
 user_agent = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
     "Chrome/120.0.0.0 Safari/537.36"
 )
-
 headers = {"User-Agent": user_agent}
 
-# 🔍 Fonction : Extraire les paragraphes d’un article à une URL donnée
+# Cache pour stocker les robotparser par domaine
+robots_parsers = {}
+
+def get_robots_parser(base_url):
+    """Récupère et met en cache le parser robots.txt pour un domaine donné"""
+    parsed_url = urlparse(base_url)
+    base = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    if base not in robots_parsers:
+        rp = urllib.robotparser.RobotFileParser()
+        rp.set_url(base + "/robots.txt")
+        try:
+            rp.read()
+        except Exception as e:
+            print(f"[Erreur] Impossible de lire robots.txt pour {base} : {e}")
+            # En cas d'erreur, on autorise par défaut
+            rp = None
+        robots_parsers[base] = rp
+    return robots_parsers[base]
+
+def can_scrape(url):
+    """Vérifie si l'URL peut être scrappée selon robots.txt"""
+    parsed_url = urlparse(url)
+    base = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    rp = get_robots_parser(base)
+    if rp is None:
+        # Si on n'a pas pu charger robots.txt, on autorise pour ne pas bloquer
+        return True
+    return rp.can_fetch(user_agent, url)
+
 def extract_paragraphs_from_url(url):
+    if not can_scrape(url):
+        print(f"[robots.txt] Scraping interdit pour {url}")
+        return []  # On ne scrape pas les URL interdites
+
     try:
         response = requests.get(url, headers=headers, timeout=20)
         response.raise_for_status()
@@ -71,9 +104,11 @@ def extract_paragraphs_from_url(url):
         print(f"[Erreur réseau] URL : {url} — {e}")
         return []
 
-
-# 🌐 Fonction : Extraire les liens internes valides depuis une page
 def extract_links_from_url(url):
+    if not can_scrape(url):
+        print(f"[robots.txt] Extraction de liens interdite pour {url}")
+        return []
+
     try:
         response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
@@ -84,14 +119,14 @@ def extract_links_from_url(url):
             if href.startswith("javascript:") or href.startswith("mailto:") or href in ['#', '']:
                 continue
             full_url = urljoin(url, href)
-            links.add(full_url)
+            # Vérifie aussi que le lien n'est pas interdit avant de le garder
+            if can_scrape(full_url):
+                links.add(full_url)
         return list(links)
     except requests.exceptions.RequestException as e:
         print(f"[Erreur récupération liens] {url} — {e}")
         return []
 
-
-# 🧠 Fonction principale : Analyse d’un site avec mots-clés et filtre par année
 def analyse_site(url, keywords, annee=None):
     resultat = defaultdict(list)
     keywords_list = [kw.strip().lower() for kw in keywords.split(',') if kw.strip()] if keywords else []
@@ -121,7 +156,7 @@ def analyse_site(url, keywords, annee=None):
 
         # Traitement des 10 premiers liens internes
         links = extract_links_from_url(url)
-        for link in links[:10]:
+        for link in links: #[:20]:
             link_paragraphs = extract_paragraphs_from_url(link)
             process_paragraphs(link_paragraphs, link)
 
