@@ -3,7 +3,8 @@ services:
     name: mon-app-flask
     env: python
     buildCommand: ""
-    startCommand: gunicorn app:app --timeout 60
+    #startCommand: gunicorn app:app --timeout 60
+    startCommand: gunicorn app:app --workers 4 --timeout 60 --worker-class gevent --bind 0.0.0.0:10000
     envVars:
       - key: FLASK_ENV
         value: production
