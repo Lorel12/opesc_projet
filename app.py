@@ -184,6 +184,22 @@ def analyser():
 
     session['analysis_id'] = analysis_id
     session['error_message'] = error_message
+    # Extraire les paragraphes pour affichage paginé
+    paragraphs = []
+    for kw, items in analyse_result.items():
+        for item in items:
+            paragraphs.append({
+                'texte': item.get('texte'),
+                'source': item.get('source', ''),
+                'date': item.get('date')
+            })
+    
+    # Stocker les infos nécessaires dans la session
+    session['paragraphs'] = paragraphs
+    session['keywords'] = mots_cles
+    session['source'] = site if mode == 'site' else doc.filename
+    session['date'] = str(datetime.now().date())
+    session['type_analyse'] = mode
 
     return redirect(url_for('resultats'))
 
