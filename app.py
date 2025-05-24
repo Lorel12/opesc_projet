@@ -227,15 +227,13 @@ def resultats():
 """
 @app.route('/resultats', methods=['GET'])
 def resultats():
-    # ... récupération des données analysées ou depuis session
-
     paragraphs = session.get('paragraphs', [])
     keywords = session.get('keywords', [])
     source = session.get('source', '')
     date = session.get('date', '')
     type_analyse = session.get('type_analyse', '')
 
-    # Pagination : nombre total de paragraphes et calcul des pages
+    # Paramètres de pagination
     page = request.args.get('page', 1, type=int)
     per_page = 10
     total = len(paragraphs)
@@ -254,10 +252,11 @@ def resultats():
             'has_next': page < total_pages
         }
     else:
+        # Même si aucun résultat, on initialise pagination pour éviter l'erreur
         paginated_paragraphs = []
         pagination = {
             'page': 1,
-            'per_page': 10,
+            'per_page': per_page,
             'total_pages': 1,
             'has_prev': False,
             'has_next': False
@@ -272,6 +271,7 @@ def resultats():
         type_analyse=type_analyse,
         pagination=pagination
     )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
