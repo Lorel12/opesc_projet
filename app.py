@@ -227,48 +227,49 @@ def resultats():
 """
 @app.route('/resultats')
 def resultats():
-    page = int(request.args.get('page', 1))
-    per_page = 10  # nombre de paragraphes à afficher par page
+    if 'results' not in session:
+        return render_template('resultats.html',
+                               current_results=None,
+                               mode=None,
+                               mots_cles=None,
+                               graph_url=None,
+                               pagination=None,
+                               error_message="Analyse introuvable. Veuillez d'abord effectuer une analyse.")
+    
+    results = session['results']
+    mode = session.get('mode', 'inconnu')
+    mots_cles = session.get('mots_cles', [])
+    graph_url = session.get('graph_url')
 
-    analysis_id = session.get('analysis_id')
-    if not analysis_id:
-        return redirect(url_for('previsions'))
+    # Pagination
+    current_page = int(request.args.get('page', 1))
+    per_page = 10
+    total = len(results)
+    total_pages = (total + per_page - 1) // per_page
 
-    conn = get_db_connection()
-    analysis = conn.execute('SELECT * FROM analyses WHERE id = ?', (analysis_id,)).fetchone()
-    conn.close()
+    if current_page < 1 or current_page > total_pages:
+        current_page = 1
 
-    if not analysis:
-        return "Analyse introuvable."
-
-    resultats_analyse = json.loads(analysis['resultats'])
-    mode = analysis['mode']
-    mots_cles = analysis['mots_cles']
-    graph_url = analysis['graph_url']
-    error_message = session.get('error_message')
-
-    # Aplatir tous les résultats dans une liste unique pour la pagination
-    all_items = []
-    for keyword, items in resultats_analyse.items():
-        for item in items:
-            item['keyword'] = keyword  # pour l'affichage
-            all_items.append(item)
-
-    total_pages = (len(all_items) + per_page - 1) // per_page
-    start = (page - 1) * per_page
+    start = (current_page - 1) * per_page
     end = start + per_page
-    paginated_items = all_items[start:end]
+    current_results = results[start:end]
 
-    return render_template(
-        'resultats.html',
-        resultats_analyse=paginated_items,
-        page=page,
-        total_pages=total_pages,
-        mode=mode,
-        mots_cles=mots_cles,
-        graph_url=graph_url,
-        error_message=error_message
-    )
+    pagination = {
+        'current_page': current_page,
+        'total_pages': total_pages,
+        'has_prev': current_page > 1,
+        'has_next': current_page < total_pages,
+        'prev_num': current_page - 1,
+        'next_num': current_page + 1
+    }
+
+    return render_template('resultats.html',
+                           current_results=current_results,
+                           mode=mode,
+                           mots_cles=mots_cles,
+                           graph_url=graph_url,
+                           pagination=pagination,
+                           error_message=None)
 
 if __name__ == "__main__":
     app.run(debug=True)
