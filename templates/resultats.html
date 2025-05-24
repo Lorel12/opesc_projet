@@ -90,7 +90,8 @@
               </div>
             {% endif %}
 
-            {% if pagination.total_pages > 1 %}
+            {% if pagination and pagination.total_pages > 1 %}
+
             <nav aria-label="Pagination">
               <ul class="pagination justify-content-center">
                 {% if pagination.has_prev %}
