@@ -58,27 +58,27 @@
 
             <div class="result-section">
               <h2>Résultats trouvés</h2>
-              {% if paragraphs %}
-                  {% for bloc in paragraphs %}
+              {% if resultats_analyse and resultats_analyse.items() %}
+                  {% for keyword, paragraphs in resultats_analyse.items() %}
                       <div class="keyword-block mb-4">
                           <h4>Mot-clé : "{{ bloc.mot_cle }}"</h4>
-                          {% if bloc.resultats %}
-                              {% for item in bloc.resultats %}
+                          {% for paragraph in paragraphs %}
+                              <!--{% for item in bloc.resultats %}-->
                                   <div class="paragraph mb-3">
                                       {% if mode == "site" %}
                                           <small class="text-muted d-block mb-1">
-                                            {% if item.source %}
-                                                <strong>Source :</strong> <a href="{{ item.source }}" target="_blank">{{ item.source }}</a><br>
+                                            {% if paragraph.source %}
+                                                <strong>Source :</strong> <a href="{{ paragraph.source }}" target="_blank">{{ paragraph.source }}</a><br>
                                             {% endif %}
                                             <strong>Date :</strong>
-                                            {% if item.date %}
-                                                {{ item.date.strftime("%d/%m/%Y") if item.date is not string else item.date }}
+                                            {% if paragraph.date %}
+                                                {{ paragraph.date.strftime("%d/%m/%Y") if paragraph.date is not string else paragraph.date }}
                                             {% else %}
                                                 Date inconnue
                                             {% endif %}
                                           </small>
                                       {% endif %}
-                                      <p>{{ item.texte }}</p>
+                                      <p>{{ paragraph.texte }}</p>
                                   </div>
                               {% endfor %}
                           {% else %}
