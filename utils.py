@@ -10,11 +10,14 @@ matplotlib.use('Agg')  # Important pour Render ou tout serveur sans interface gr
 import matplotlib.pyplot as plt
 import docx
 from collections import defaultdict
-import os, json, sqlite3
+import os, json, sqlite3, logging
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from dateutil import parser
 import pdfplumber
+
+# Configuration du logger
+logging.basicConfig(filename='logs.txt', level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s')
 
 # User-Agent pour le scraping web
 user_agent = (
@@ -24,11 +27,17 @@ user_agent = (
 )
 headers = {"User-Agent": user_agent}
 
-
 # 🔍 Fonction 1 : Extraction de texte depuis différents formats
 def extraction_du_texte(fichier):
     extension = os.path.splitext(fichier)[1].lower()
     text = ""
+
+    # ✅ Limitation de la taille du fichier (5 Mo)
+    MAX_FILE_SIZE_MB = 5
+    if os.path.getsize(fichier) > MAX_FILE_SIZE_MB * 1024 * 1024:
+        logging.warning(f"Fichier trop volumineux : {fichier}")
+        return None
+
     try:
         if extension == ".pdf":
             with pdfplumber.open(fichier) as pdf:
@@ -39,7 +48,7 @@ def extraction_du_texte(fichier):
                         if page_text:
                             text += page_text + "\n"
                     except Exception as e:
-                        print(f"[Erreur PDF page {i}] {e}")
+                        logging.error(f"[Erreur PDF page {i}] {e}")
                         continue
 
         elif extension == ".docx":
@@ -52,15 +61,14 @@ def extraction_du_texte(fichier):
                 text = f.read()
 
         else:
-            print("❌ Format non supporté :", extension)
+            logging.warning(f"❌ Format non supporté : {extension}")
             return None
 
     except Exception as e:
-        print(f"[Erreur extraction globale] {e}")
+        logging.error(f"[Erreur extraction globale] {e}")
         return None
 
     return text
-
 
 # ✂️ Fonction 2 : Découpe le texte en phrases
 def division_en_phrases(text):
@@ -68,17 +76,27 @@ def division_en_phrases(text):
         return []
     sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s+', text)
     sentences = [s.strip() for s in sentences if s.strip()]
-    print(f"[Division] Nombre de phrases extraites : {len(sentences)}")
+    logging.info(f"[Division] Nombre de phrases extraites : {len(sentences)}")
     return sentences
-
 
 # 🧠 Fonction 3 : Recherche de mots-clés dans les phrases
 def recherche_mots_cles(sentences, keywords):
     results = {}
     keywords_list = [kw.strip() for kw in keywords.split(',') if kw.strip()]
+    now = datetime.now().strftime('%Y-%m-%d %H:%M')
+
     for keyword in keywords_list:
         keyword_lower = keyword.lower()
-        print(f"[Recherche] Mot-clé '{keyword_lower}' dans {len(sentences)} phrases...")
-        found = [{"texte": sentence} for sentence in sentences if keyword_lower in sentence.lower()]
+        logging.info(f"[Recherche] Mot-clé '{keyword_lower}' dans {len(sentences)} phrases...")
+
+        # Recherche avec mot complet uniquement (expression régulière)
+        found = []
+        for sentence in sentences:
+            if re.search(rf'\b{re.escape(keyword_lower)}\b', sentence, re.IGNORECASE):
+                found.append({
+                    "texte": sentence,
+                    "date": now
+                })
         results[keyword] = found
+
     return results
