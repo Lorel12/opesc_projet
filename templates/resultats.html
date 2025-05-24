@@ -56,7 +56,7 @@
               <p><strong>Mode :</strong> {{ mode }}</p>
               <p><strong>Mots-clés :</strong> {{ mots_cles }}</p>
             </div>
-        
+
             <div class="result-section">
               <h2>Résultats trouvés</h2>
               {% if resultats_analyse and resultats_analyse.items() %}
@@ -87,6 +87,7 @@
                 <p>Aucun résultat n'a pu être généré.</p>
               {% endif %}
             </div>
+
         
             {# Affichage du graphique si l'URL est fournie #}
             {% if graph_url %}
@@ -95,7 +96,37 @@
                 <img src="{{ graph_url }}" alt="Graphique des résultats">
               </div>
             {% endif %}
-        
+
+            <!-- PAGINATION -->
+            {% if pagination.total_pages > 1 %}
+            <nav aria-label="Pagination">
+              <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                  <li class="page-item">
+                    <a class="page-link" href="{{ url_for('resultats', page=pagination.prev_num) }}">Précédent</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+                {% endif %}
+            
+                {% for p in range(1, pagination.total_pages + 1) %}
+                  {% if p == pagination.current_page %}
+                    <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                  {% else %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('resultats', page=p) }}">{{ p }}</a></li>
+                  {% endif %}
+                {% endfor %}
+            
+                {% if pagination.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="{{ url_for('resultats', page=pagination.next_num) }}">Suivant</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+                {% endif %}
+              </ul>
+            </nav>
+            {% endif %}
             <div class="result-section">
               <a href="{{ url_for('previsions') }}">Retour à l'accueil</a>
             </div>
