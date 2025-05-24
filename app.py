@@ -188,7 +188,7 @@ def analyser():
     return redirect(url_for('resultats'))
 
 from datetime import datetime
-
+"""
 @app.route('/resultats', methods=['GET'])
 def resultats():
     if not session.get('loggedin'):
@@ -224,5 +224,51 @@ def resultats():
         mots_cles = row['mots_cles'],
         graph_url = row['graph_url']
     )
+"""
+@app.route('/resultats')
+def resultats():
+    page = int(request.args.get('page', 1))
+    per_page = 10  # nombre de paragraphes à afficher par page
+
+    analysis_id = session.get('analysis_id')
+    if not analysis_id:
+        return redirect(url_for('previsions'))
+
+    conn = get_db_connection()
+    analysis = conn.execute('SELECT * FROM analyses WHERE id = ?', (analysis_id,)).fetchone()
+    conn.close()
+
+    if not analysis:
+        return "Analyse introuvable."
+
+    resultats_analyse = json.loads(analysis['resultats'])
+    mode = analysis['mode']
+    mots_cles = analysis['mots_cles']
+    graph_url = analysis['graph_url']
+    error_message = session.get('error_message')
+
+    # Aplatir tous les résultats dans une liste unique pour la pagination
+    all_items = []
+    for keyword, items in resultats_analyse.items():
+        for item in items:
+            item['keyword'] = keyword  # pour l'affichage
+            all_items.append(item)
+
+    total_pages = (len(all_items) + per_page - 1) // per_page
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_items = all_items[start:end]
+
+    return render_template(
+        'resultats.html',
+        resultats_analyse=paginated_items,
+        page=page,
+        total_pages=total_pages,
+        mode=mode,
+        mots_cles=mots_cles,
+        graph_url=graph_url,
+        error_message=error_message
+    )
+
 if __name__ == "__main__":
     app.run(debug=True)
