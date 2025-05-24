@@ -108,13 +108,6 @@ def contact():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
 
-    """ 
-    user = mongo.db.accounts.find_one(
-       {'username': session['username']},
-       {'email': 1, '_id': 0}
-    ) 
-    #user_email = user.get('email','')
-    """
     return render_template('contact.html',
                            username=session['username'], email=session.get('email', ''))
                            #email=session['email'])
@@ -194,7 +187,6 @@ def analyser():
                 'keyword': keyword 
             })
     
-    # Stocker les infos nécessaires dans la session
     session['paragraphs'] = paragraphs
     session['keywords'] = mots_cles
     session['source'] = site if mode == 'site' else doc.filename
@@ -203,7 +195,7 @@ def analyser():
 
     return redirect(url_for('resultats'))
 
-"""
+
 @app.route('/resultats', methods=['GET'])
 def resultats():
     if not session.get('loggedin'):
@@ -220,10 +212,8 @@ def resultats():
     if not row:
         return render_template('resultats.html', error_message="Analyse introuvable.")
 
-    # 1) on recharge le JSON
     resultats_analyse = json.loads(row['resultats'])
 
-    # 2) on reconvertit chaque champ 'date' str → datetime
     for kw, items in resultats_analyse.items():
         for item in items:
             d = item.get('date')
@@ -233,50 +223,14 @@ def resultats():
                 except ValueError:
                     item['date'] = None
 
-    return render_template('resultats.html',
-        resultats_analyse=resultats_analyse,
-        mode      = row['mode'],
-        mots_cles = row['mots_cles'],
-        graph_url = row['graph_url']
-    )
-"""
-@app.route('/resultats', methods=['GET'])
-def resultats():
-    if not session.get('loggedin'):
-        return redirect(url_for('login'))
-
-    aid = session.get('analysis_id')
-    if not aid:
-        return render_template('resultats.html', error_message="Aucune analyse en session.")
-
-    conn = get_db_connection()
-    row = conn.execute('SELECT * FROM analyses WHERE id=?', (aid,)).fetchone()
-    conn.close()
-
-    if not row:
-        return render_template('resultats.html', error_message="Analyse introuvable.")
-
-    # 1) Recharger le JSON
-    resultats_analyse = json.loads(row['resultats'])
-
-    # 2) Reconversion champ 'date' : str → datetime
-    for kw, items in resultats_analyse.items():
-        for item in items:
-            d = item.get('date')
-            if isinstance(d, str):
-                try:
-                    item['date'] = datetime.fromisoformat(d)
-                except ValueError:
-                    item['date'] = None
-
-    # 3) Récupération des éléments de session
+    # Récupération des éléments de session
     paragraphs = session.get('paragraphs', [])
     keywords = session.get('keywords', [])
     source = session.get('source', '')
     date = session.get('date', '')
     type_analyse = session.get('type_analyse', '')
 
-    # 4) Pagination
+    #Pagination
     page = request.args.get('page', 1, type=int)
     per_page = 10
     total = len(paragraphs)
