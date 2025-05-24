@@ -44,7 +44,6 @@
         <div class="containerDiv">
             <h1>Résultats de l'analyse</h1>
         
-            {# Affichage d'une erreur si présente #}
             {% if error_message %}
               <div class="error">
                 <p>{{ error_message }}</p>
@@ -59,37 +58,31 @@
 
             <div class="result-section">
               <h2>Résultats trouvés</h2>
-              {% if resultats_analyse and resultats_analyse.items() %}
-                  {% for keyword, paragraphs in resultats_analyse.items() %}
-                      <div class="keyword-section">
-                          <h4>Mot-clé : "{{ keyword }}"</h4>
-                          {% for paragraph in paragraphs %}
-                              <div class="paragraph mb-4">
-                              {% if mode == "site" %} 
-                                  <small class="text-muted d-block mb-1">
-                                    {% if paragraph.source %}
-                                        <strong>Source :</strong> <a href="{{ paragraph.source }}" target="_blank">{{ paragraph.source }}</a><br>
-                                    {% endif %}
-                                    <strong>Date :</strong>
-                                    {% if paragraph.date %}
-                                        {{ paragraph.date.strftime("%d/%m/%Y") if paragraph.date is not string else paragraph.date }}
-                                    {% else %}
-                                        Date inconnue
-                                    {% endif %}
-                                </small>
-                              {% endif %}
-                              <p>{{ paragraph.texte }}</p>
-                              </div>
-                          {% endfor %}
+              {% if current_results %}
+                  {% for item in current_results %}
+                      <div class="paragraph mb-4">
+                          <h5>Mot-clé : "{{ item.keyword }}"</h5>
+                          {% if mode == "site" %} 
+                              <small class="text-muted d-block mb-1">
+                                {% if item.source %}
+                                    <strong>Source :</strong> <a href="{{ item.source }}" target="_blank">{{ item.source }}</a><br>
+                                {% endif %}
+                                <strong>Date :</strong>
+                                {% if item.date %}
+                                    {{ item.date.strftime("%d/%m/%Y") if item.date is not string else item.date }}
+                                {% else %}
+                                    Date inconnue
+                                {% endif %}
+                              </small>
+                          {% endif %}
+                          <p>{{ item.texte }}</p>
                       </div>
                   {% endfor %}        
               {% else %}
-                <p>Aucun résultat n'a pu être généré.</p>
+                <p>Aucun résultat à afficher pour cette page.</p>
               {% endif %}
             </div>
 
-        
-            {# Affichage du graphique si l'URL est fournie #}
             {% if graph_url %}
               <div class="graph">
                 <h2>Graphique</h2>
@@ -97,7 +90,6 @@
               </div>
             {% endif %}
 
-            <!-- PAGINATION -->
             {% if pagination.total_pages > 1 %}
             <nav aria-label="Pagination">
               <ul class="pagination justify-content-center">
