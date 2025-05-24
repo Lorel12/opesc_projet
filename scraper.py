@@ -16,13 +16,14 @@ from datetime import datetime
 from dateutil import parser
 
 # User-Agent utilisé pour éviter les blocages par certains sites
+
 user_agent = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
     "Chrome/120.0.0.0 Safari/537.36"
 )
-headers = {"User-Agent": user_agent}
 
+headers = {"User-Agent": user_agent}
 
 # 🔍 Fonction : Extraire les paragraphes d’un article à une URL donnée
 def extract_paragraphs_from_url(url):
