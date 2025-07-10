@@ -32,6 +32,9 @@ robots_parsers = {}
 def get_robots_parser(base_url):
     """Récupère et met en cache le parser robots.txt pour un domaine donné"""
     parsed_url = urlparse(base_url)
+    if not parsed_url.netloc:  # Vérifie qu'on a bien un domaine valide
+        print(f"[Erreur] URL malformée ignorée : {base_url}")
+        return None
     base = f"{parsed_url.scheme}://{parsed_url.netloc}"
     if base not in robots_parsers:
         rp = urllib.robotparser.RobotFileParser()
