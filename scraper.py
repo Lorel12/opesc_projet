@@ -119,28 +119,41 @@ def extract_paragraphs_from_url(url):
         print(f"[Erreur réseau] URL : {url} — {e}")
         return []
 
+from urllib.parse import urlparse, urljoin
+
 def extract_links_from_url(url):
     if not can_scrape(url):
         print(f"[robots.txt] Extraction de liens interdite pour {url}")
         return []
 
     try:
-        response = requests.get(url, headers=headers, timeout=30)
+        response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
         links = set()
         for link in soup.find_all('a', href=True):
             href = link['href'].strip()
-            if href.startswith("javascript:") or href.startswith("mailto:") or href in ['#', '']:
+
+            # 🚫 Ignorer les liens vides, ancres, mails, JS, etc.
+            if href.startswith(('javascript:', 'mailto:', '#')) or href == '':
                 continue
+
             full_url = urljoin(url, href)
-            # Vérifie aussi que le lien n'est pas interdit avant de le garder
+
+            parsed = urlparse(full_url)
+            if not parsed.scheme.startswith('http') or not parsed.netloc:
+                print(f"[Lien ignoré] URL invalide : {full_url}")
+                continue
+
             if can_scrape(full_url):
                 links.add(full_url)
+
         return list(links)
+
     except requests.exceptions.RequestException as e:
         print(f"[Erreur récupération liens] {url} — {e}")
         return []
+
 
 def analyse_site(url, keywords, annee=None):
     resultat = defaultdict(list)
