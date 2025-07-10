@@ -32,6 +32,13 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 init_db()
 
+def get_robots_parser(base_url):
+    parsed_url = urlparse(base_url)
+    if not parsed_url.netloc:  # Vérifie qu'on a bien un domaine valide
+        print(f"[Erreur] URL malformée ignorée : {base_url}")
+        return None
+    ...
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     msg = ''
