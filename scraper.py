@@ -127,22 +127,22 @@ def extract_links_from_url(url):
         return []
 
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=20)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
         links = set()
+
         for link in soup.find_all('a', href=True):
             href = link['href'].strip()
 
-            # 🚫 Ignorer les liens vides, ancres, mails, JS, etc.
-            if href.startswith(('javascript:', 'mailto:', '#')) or href == '':
+            if href.startswith(('javascript:', 'mailto:', '#')) or not href:
                 continue
 
             full_url = urljoin(url, href)
 
             parsed = urlparse(full_url)
             if not parsed.scheme.startswith('http') or not parsed.netloc:
-                print(f"[Lien ignoré] URL invalide : {full_url}")
+                print(f"[Lien ignoré] URL invalide ou locale : {href} → {full_url}")
                 continue
 
             if can_scrape(full_url):
@@ -153,6 +153,7 @@ def extract_links_from_url(url):
     except requests.exceptions.RequestException as e:
         print(f"[Erreur récupération liens] {url} — {e}")
         return []
+
 
 
 def analyse_site(url, keywords, annee=None):
