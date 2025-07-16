@@ -32,7 +32,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 init_db()
 
-#@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     msg = ''
     if request.method == 'POST':
@@ -53,7 +53,7 @@ def login():
             msg = 'Mot de passe incorrect !'
     return render_template('login.html', msg=msg)
 
-#@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
     if request.method == 'POST':
@@ -91,7 +91,7 @@ def users():
     conn.close()
     return render_template('users.html', users=users)
 
-@app.route('/')
+@app.route('/home')
 def home():
     if 'loggedin' in session:
         return render_template('accueil.html', username=session['username'])
@@ -105,8 +105,8 @@ def previsions():
 
 @app.route('/contact', methods=['GET','POST'])
 def contact():
-    #if 'loggedin' not in session:
-        #return redirect(url_for('login'))
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
 
     return render_template('contact.html',
                            username=session['username'], email=session.get('email', ''))
