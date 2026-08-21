@@ -28,7 +28,7 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background-color: rgba(0, 123, 255, 0.08);
+    background-color: rgba(30, 64, 175, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -37,7 +37,7 @@
 
 .analysis-option-icon {
     font-size: 1.8rem;
-    color: #007bff;
+    color: #1e40af;
 }
 
 .analysis-option-card .card-title {

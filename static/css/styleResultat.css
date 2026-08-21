@@ -26,7 +26,7 @@ h1 {
 
 .result-section h2 {
     color: var(--color-text);
-    border-bottom: 2px solid #007bff;
+    border-bottom: 2px solid #1e40af;
     padding-bottom: 8px;
     display: inline-block;
 }
@@ -66,8 +66,8 @@ h1 {
 }
 
 .badge-keyword {
-    background-color: rgba(0, 123, 255, 0.08);
-    color: #007bff;
+    background-color: rgba(30, 64, 175, 0.08);
+    color: #1e40af;
     font-weight: 400;
 }
 
