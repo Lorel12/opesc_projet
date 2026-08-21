@@ -15,3 +15,14 @@ CREATE TABLE IF NOT EXISTS analyses (
     graph_url TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS articles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    titre TEXT NOT NULL,
+    contenu TEXT,
+    image_url TEXT,
+    url TEXT,
+    date_publication TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
