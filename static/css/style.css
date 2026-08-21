@@ -1,6 +1,6 @@
 * {
     box-sizing: border-box;
-    font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+    font-family:'Times New Roman', Times, serif;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -14,18 +14,19 @@ body {
     max-width: 400px;
     width: 90%;
     margin: 80px auto;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    box-shadow: var(--shadow-soft);
     background: #fff;
-    border-radius: 12px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-lg);
 }
 .login h1, .register h1 {
     text-align: center;
-    color: #333;
+    color: var(--color-text);
     font-weight: 700;
     font-size: 24px;
-    padding: 20px 0 20px 0;
-    border-bottom: 1px solid #dee0e4;
+    padding: 0 0 20px 0;
+    border-bottom: 1px solid var(--color-border-soft);
 }
 .login .links, .register .links {
     display: flex;
@@ -73,15 +74,15 @@ body {
     margin-top: 20px;
     background-color: #007bff;
     border: 0;
-    border-radius: 5px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: bold;
     color: #ffffff;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.15s ease;
 }
 .login form input[type="submit"]:hover, .register form input[type="submit"]:hover {
     background-color: #0056b3;
-    transition: background-color 0.2s;
+    transform: translateY(-1px);
 }
 .navtop {
     background-color: #2f3947;
