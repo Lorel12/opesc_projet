@@ -1,0 +1,115 @@
+/* Fondations partagées du design "soft premium" : typographie, couleurs,
+   rayons et ombres. Chargé sur toutes les pages ; les feuilles de style
+   propres à chaque page complètent ces règles de base. */
+
+:root {
+    --color-text: #333333;
+    --color-text-muted: #666666;
+    --color-border-soft: #e5e5e5;
+    --color-bg-page: #f8f9fa;
+    --color-bg-card: #ffffff;
+    --color-accent: #007bff;
+    --color-accent-hover: #0056b3;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --shadow-soft: 0 2px 16px rgba(0, 0, 0, 0.06);
+    --shadow-soft-hover: 0 10px 28px rgba(0, 0, 0, 0.09);
+}
+
+body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--color-text);
+    background-color: var(--color-bg-page);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+}
+
+p {
+    color: var(--color-text);
+}
+
+small, .text-muted, .card-text {
+    color: var(--color-text-muted) !important;
+}
+
+a {
+    color: var(--color-accent);
+}
+
+a:hover {
+    color: var(--color-accent-hover);
+}
+
+/* Cartes : bordure très fine, ombre douce, coins arrondis, transition soyeuse */
+.card {
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-card);
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-soft-hover);
+}
+
+.btn {
+    border-radius: var(--radius-md);
+    letter-spacing: 0.01em;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+}
+
+.form-control {
+    border-radius: var(--radius-md);
+    border-color: var(--color-border-soft);
+}
+
+.form-control:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.12);
+}
+
+.badge {
+    border-radius: 999px;
+    font-weight: 400;
+    padding: 0.4em 0.8em;
+    letter-spacing: 0.01em;
+}
+
+/* En-tête et pied de page communs */
+.navbar-brand {
+    letter-spacing: 0.01em;
+}
+
+footer a.text-white:hover {
+    color: var(--color-accent) !important;
+    text-decoration: none;
+}
+
+footer h5 {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
