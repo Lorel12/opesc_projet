@@ -1,47 +1,34 @@
-*{
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 16px;
-}
 .navbar .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-h2{
-    text-align: center;
-}
 .analysis-options {
     padding: 50px 0;
     background-color: #f8f9fa;
 }
 
 .analysis-options h2 {
+    text-align: center;
     font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .analysis-option-card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
-}
-
-.analysis-option-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
 .analysis-option-card .card-body {
     padding: 40px 30px;
+    text-align: center;
 }
 
 .analysis-option-icon-wrapper {
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background-color: rgba(0, 123, 255, 0.1);
+    background-color: rgba(0, 123, 255, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -58,18 +45,15 @@ h2{
     margin-bottom: 12px;
 }
 
-.analysis-option-card .card-text {
-    color: #6c757d;
-    margin-bottom: 0;
-}
-
 .analysis-form-section {
     padding: 40px 0;
 }
 
 .form-section-title {
+    text-align: center;
     font-size: 1.5rem;
-    font-weight: 200;
+    font-weight: 400;
+    letter-spacing: 0.01em;
     margin-bottom: 20px;
 }
 
@@ -79,16 +63,7 @@ h2{
 
 .result-title {
     font-size: 1.5rem;
-    font-weight: 200;
+    font-weight: 400;
+    letter-spacing: 0.01em;
     margin-bottom: 20px;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
 }
