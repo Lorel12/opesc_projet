@@ -1,8 +1,9 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
     font-size: 16px;
+    background-color: #f8f9fa;
 }
 .navbar .container {
     display: flex;
@@ -12,19 +13,23 @@ body {
 .containerDiv {
     max-width: 900px;
     margin: 30px auto;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
     text-align: center;
+    font-weight: 700;
 }
 
 .result-section h2 {
     color: #333;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
+    font-weight: 700;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 8px;
+    display: inline-block;
 }
 
 .result-section {
@@ -42,19 +47,19 @@ h1 {
 
 .paragraph {
     border: 1px solid #eee;
-    padding: 10px;
+    padding: 15px;
     margin-bottom: 10px;
-    border-radius: 3px;
+    border-radius: 8px;
     background-color: #fafafa;
 }
 
 .error {
-    color: red;
-    border: 1px solid red;
-    padding: 10px;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    padding: 12px 15px;
     margin-bottom: 20px;
-    border-radius: 5px;
-    background-color: #ffecec;
+    border-radius: 8px;
+    background-color: #f8d7da;
 }
 
 .graph {
