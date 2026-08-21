@@ -68,6 +68,22 @@
             </div>
             {% endif %}
 
+            {% if analysis_id and paragraphs %}
+            <div class="result-section">
+              <h2>Synthèse automatique</h2>
+              {% if resume %}
+                <div class="alert alert-light border" style="white-space: pre-line;">{{ resume }}</div>
+                <form method="POST" action="{{ url_for('generer_resume_analyse') }}">
+                  <button type="submit" class="btn btn-outline-secondary btn-sm">Régénérer la synthèse</button>
+                </form>
+              {% else %}
+                <form method="POST" action="{{ url_for('generer_resume_analyse') }}">
+                  <button type="submit" class="btn btn-primary btn-sm">Générer une synthèse par IA</button>
+                </form>
+              {% endif %}
+            </div>
+            {% endif %}
+
             <div class="result-section">
               <h2>Résultats trouvés</h2>
               {% if paragraphs %}
