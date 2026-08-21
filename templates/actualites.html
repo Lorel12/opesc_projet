@@ -26,7 +26,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="#">Prévisions Cameroun</a>
+                <a class="navbar-brand" href="{{ url_for('home') }}" style="font-size: 12px;">Système intégré de surveillance, de prévision et de contrôle des risques économiques</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -37,10 +37,13 @@
                             <a class="nav-link" href="{{ url_for('home') }}">Accueil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('previsions') }}">Prévisions</a>
+                            <a class="nav-link" href="{{ url_for('previsions') }}">Recherche avancée</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('resultats') }}">Analyses</a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="{{ url_for('actualites') }}">Actualité</a>
+                            <a class="nav-link" href="{{ url_for('actualites') }}">Actualités</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
@@ -66,22 +69,25 @@
                     {% for article in articles %}
                     <div class="col-md-4 mb-4">
                         <div class="card news-card">
-                            <img src="{{ article.image_url }}" class="news-card-img" alt="{{ article.titre }}">
+                            <img src="{{ article.image_url or url_for('static', filename='images/mon_image.jpg') }}" class="news-card-img" alt="{{ article.titre }}">
                             <div class="news-card-body">
                                 <h5 class="news-card-title">{{ article.titre }}</h5>
                                 <p class="news-card-text">{{ article.contenu | truncate(150) }}</p>
                                 </div>
                             <div class="news-card-footer">
-                                <small class="news-card-date">{{ article.date_publication }}</small>
-                                <a href="{{ article.url }}" class="news-card-link">Lire plus</a>
+                                <small class="news-card-date">{{ article.date_publication or "Date inconnue" }}</small>
+                                <a href="{{ article.url }}" class="news-card-link" target="_blank">Lire plus</a>
                             </div>
                         </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-center">
+                        <p>Aucun article pour le moment.</p>
                     </div>
                     {% endfor %}
                 </div>
                 <div class="text-center mt-4">
-                    <a href="{{ url_for('ajouter_article') }}" class="btn add-article-btn">Retour à l'ajout
-                        d'articles</a>
+                    <a href="{{ url_for('ajouter_article') }}" class="btn add-article-btn">Ajouter un article</a>
                 </div>
             </div>
         </section>
@@ -102,8 +108,9 @@
                     <h5>Liens</h5>
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('home') }}" class="text-white">Accueil</a></li>
-                        <li><a href="{{ url_for('previsions') }}" class="text-white">Prévisions</a></li>
-                        <li><a href="{{ url_for('resultats') }}" class="text-white">Analyse</a></li>
+                        <li><a href="{{ url_for('previsions') }}" class="text-white">Recherche avancée</a></li>
+                        <li><a href="{{ url_for('resultats') }}" class="text-white">Analyses</a></li>
+                        <li><a href="{{ url_for('actualites') }}" class="text-white">Actualités</a></li>
                         <li><a href="{{ url_for('contact') }}" class="text-white">Contact</a></li>
                     </ul>
                 </div>
@@ -114,7 +121,7 @@
                 </div>
             </div>
             <div class="text-center mt-4">
-                <p>&copy; 2023 Prévisions Économiques du Cameroun</p>
+                <p>&copy; 2025 Prévisions Économiques du Cameroun</p>
             </div>
         </div>
     </footer>
