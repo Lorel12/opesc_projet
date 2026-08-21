@@ -83,7 +83,7 @@ def division_en_phrases(text):
 def recherche_mots_cles(sentences, keywords):
     results = {}
     keywords_list = [kw.strip() for kw in keywords.split(',') if kw.strip()]
-    now = datetime.now().strftime('%Y-%m-%d %H:%M')
+    now = datetime.now().isoformat()
 
     for keyword in keywords_list:
         keyword_lower = keyword.lower()
@@ -101,3 +101,18 @@ def recherche_mots_cles(sentences, keywords):
         results[keyword] = found
 
     return results
+
+# 📅 Fonction 4 : Formatage d'une date (str ISO ou datetime) pour l'affichage
+def format_display_date(value):
+    if value is None:
+        return "Date inconnue"
+    if isinstance(value, datetime):
+        return value.strftime('%d/%m/%Y %H:%M')
+    if isinstance(value, str):
+        if value == "Date inconnue" or not value.strip():
+            return "Date inconnue"
+        try:
+            return datetime.fromisoformat(value).strftime('%d/%m/%Y %H:%M')
+        except ValueError:
+            return value
+    return "Date inconnue"
