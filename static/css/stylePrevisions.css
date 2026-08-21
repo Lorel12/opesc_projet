@@ -12,24 +12,55 @@ h2{
     text-align: center;
 }
 .analysis-options {
-    padding: 40px 0;
+    padding: 50px 0;
     background-color: #f8f9fa;
+}
+
+.analysis-options h2 {
+    font-weight: 700;
 }
 
 .analysis-option-card {
     border: none;
+    border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
 }
 
 .analysis-option-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.analysis-option-card .card-body {
+    padding: 40px 30px;
+}
+
+.analysis-option-icon-wrapper {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background-color: rgba(0, 123, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
 }
 
 .analysis-option-icon {
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: #007bff;
-    margin-bottom: 20px;
+}
+
+.analysis-option-card .card-title {
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.analysis-option-card .card-text {
+    color: #6c757d;
+    margin-bottom: 0;
 }
 
 .analysis-form-section {

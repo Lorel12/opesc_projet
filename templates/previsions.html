@@ -8,10 +8,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/stylePrevisions.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-    .analysis-option-card { cursor: pointer; transition: transform 0.2s; }
-    .analysis-option-card:hover { transform: scale(1.05); }
-  </style>
 </head>
 <body>
   <header>
@@ -38,21 +34,25 @@
   <main class="mt-4">
     <section class="analysis-options">
       <div class="container">
-        <h2 class="text-center mb-4">Choisissez votre méthode d'analyse</h2>
-        <div class="row">
-          <div class="col-md-6 mb-4">
-            <div class="card analysis-option-card" onclick="showForm('document')">
+        <h2 class="text-center mb-5">Choisissez votre méthode d'analyse</h2>
+        <div class="row justify-content-center">
+          <div class="col-md-5 mb-4">
+            <div class="card analysis-option-card h-100" onclick="showForm('document')">
               <div class="card-body text-center">
-                <i class="fas fa-file-alt fa-3x mb-3"></i>
+                <div class="analysis-option-icon-wrapper">
+                  <i class="fas fa-file-alt analysis-option-icon"></i>
+                </div>
                 <h5 class="card-title">Analyse de Documents</h5>
                 <p class="card-text">Analysez des fichiers PDF ou texte pour extraire des informations clés.</p>
               </div>
             </div>
           </div>
-          <div class="col-md-6 mb-4">
-            <div class="card analysis-option-card" onclick="showForm('site')">
+          <div class="col-md-5 mb-4">
+            <div class="card analysis-option-card h-100" onclick="showForm('site')">
               <div class="card-body text-center">
-                <i class="fas fa-globe fa-3x mb-3"></i>
+                <div class="analysis-option-icon-wrapper">
+                  <i class="fas fa-globe analysis-option-icon"></i>
+                </div>
                 <h5 class="card-title">Analyse de Sites Web</h5>
                 <p class="card-text">Scrapez et analysez le contenu de sites web spécifiques.</p>
               </div>
