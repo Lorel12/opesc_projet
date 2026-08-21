@@ -1,0 +1,16 @@
+# Environnements Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Données runtime (recréées automatiquement par l'application)
+database.db
+logs.txt
+uploads/*
+static/images/graph_*.png
+
+# Fichiers d'éditeur / OS
+.vscode/
+.idea/
+Thumbs.db
