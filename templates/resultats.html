@@ -59,13 +59,22 @@
               <p><strong>Mots-clés :</strong> {{ mots_cles }}</p>
             </div>
 
+            {% if themes_summary %}
+            <div class="result-section">
+              <h2>Thèmes identifiés</h2>
+              {% for theme, count in themes_summary %}
+                <span class="badge badge-info mr-2 mb-2" style="font-size: 0.9em;">{{ theme }} ({{ count }})</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+
             <div class="result-section">
               <h2>Résultats trouvés</h2>
               {% if paragraphs %}
                   {% for item in paragraphs %}
                       <div class="paragraph mb-4">
                           <h5>Mot-clé : "{{ item.keyword }}"</h5>
-                          {% if mode == "site" %} 
+                          {% if mode == "site" %}
                               <small class="text-muted d-block mb-1">
                                 {% if item.source %}
                                     <strong>Source :</strong> <a href="{{ item.source }}" target="_blank">{{ item.source }}</a><br>
@@ -75,8 +84,15 @@
                               </small>
                           {% endif %}
                           <p>{{ item.texte }}</p>
+                          {% if item.themes %}
+                              <div>
+                                  {% for theme in item.themes %}
+                                      <span class="badge badge-secondary mr-1">{{ theme }}</span>
+                                  {% endfor %}
+                              </div>
+                          {% endif %}
                       </div>
-                  {% endfor %}        
+                  {% endfor %}
               {% else %}
                 <p>Aucun résultat à afficher pour cette page.</p>
               {% endif %}
