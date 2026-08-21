@@ -10,7 +10,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import PyPDF2, docx
 from collections import defaultdict
-import os, json, sqlite3
+import os, json, sqlite3, uuid
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from dateutil import parser
@@ -22,9 +22,8 @@ def generate_graph(phrases, keywords):
     keywords_list = [kw.strip().lower() for kw in keywords.split(',') if kw.strip()]
     counts = {kw: 0 for kw in keywords_list}
     for phrase in phrases:
-        lower_phrase = phrase.lower()
         for kw in keywords_list:
-            counts[kw] += lower_phrase.count(kw)
+            counts[kw] += len(re.findall(rf'\b{re.escape(kw)}\b', phrase, re.IGNORECASE))
     df = pd.DataFrame(list(counts.items()), columns=["Mot clé", "Fréquence"])
     if not df.empty:
         plt.figure(figsize=(8, 6))
@@ -34,9 +33,10 @@ def generate_graph(phrases, keywords):
         plt.ylabel("Fréquence")
         img_path = os.path.join("static", "images")
         os.makedirs(img_path, exist_ok=True)
-        graph_file = os.path.join(img_path, "graph.png")
+        filename = f"graph_{uuid.uuid4().hex[:12]}.png"
+        graph_file = os.path.join(img_path, filename)
         plt.savefig(graph_file)
         plt.close()
-        return url_for("static", filename="images/graph.png")
+        return url_for("static", filename=f"images/{filename}")
     else:
         return None
