@@ -16,8 +16,8 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from dateutil import parser
 
-from utils import extraction_du_texte, division_en_phrases, recherche_mots_cles
-from scraper import extract_paragraphs_from_url, extract_links_from_url, analyse_site
+from utils import extraction_du_texte, division_en_phrases, recherche_mots_cles, format_display_date
+from scraper import extract_paragraphs_from_url, extract_links_from_url, analyse_site, extract_article_preview
 from graph import generate_graph
 from database import init_db, get_db_connection
 
@@ -29,6 +29,9 @@ app = Flask(__name__)
 app.secret_key = 'your secret key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="requests")
 
 init_db()
 
@@ -74,7 +77,7 @@ def register():
         else:
             hash_password = hashlib.sha1((password + app.secret_key).encode()).hexdigest()
             conn.execute('INSERT INTO accounts (username, password, email, created_at) VALUES (?, ?, ?, ?)',
-                         (username, hash_password, email, datetime.now()))
+                         (username, hash_password, email, datetime.now().isoformat()))
             conn.commit()
             conn.close()
             msg = 'Enregistrement terminé avec succès !'
@@ -87,8 +90,15 @@ def users():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
     conn = get_db_connection()
-    users = conn.execute('SELECT username, email, created_at FROM accounts ORDER BY created_at DESC').fetchall()
+    rows = conn.execute('SELECT username, email, created_at FROM accounts ORDER BY created_at DESC').fetchall()
     conn.close()
+
+    users = []
+    for row in rows:
+        user = dict(row)
+        user['created_at'] = format_display_date(user['created_at'])
+        users.append(user)
+
     return render_template('users.html', users=users)
 
 @app.route('/home')
@@ -114,19 +124,26 @@ def contact():
 
 @app.route('/analyser', methods=['POST'])
 def analyser():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
     mode = request.form.get('mode')
     mots_cles = request.form.get('keywords')
     analyse_result = {}
     graph_url = None
     error_message = None
+    source_label = ''
+    doc = None
+    site = None
     try:
         if mode == 'document':
             doc = request.files.get('document')
-            if not doc:
+            if not doc or not doc.filename:
                 raise ValueError('Veuillez télécharger un document.')
+            source_label = doc.filename
             path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(doc.filename))
             doc.save(path)
-            
+
             text = extraction_du_texte(path)
             sentences = division_en_phrases(text)
             analyse_result = recherche_mots_cles(sentences, mots_cles)
@@ -136,19 +153,24 @@ def analyser():
                 graph_url = generate_graph(phrases, mots_cles)
         elif mode == 'site':
             site = request.form.get('site_url') or request.form.get('site_select')
-            annee = request.form.get('annee')  
+            source_label = site or ''
+            annee = request.form.get('annee')
             annee = int(annee) if annee and annee.isdigit() else None
             if site:
                 paragraphs_data = extract_paragraphs_from_url(site)
                 if not paragraphs_data:
                     error_message = "Ce site ne semble pas être scrapable."
                 else:
-                    analyse_result = analyse_site(site, mots_cles, annee)  
-                    phrases = [p['texte'] for lst in analyse_result.values() for p in lst]
-                    if phrases:
-                        graph_url = generate_graph(phrases, mots_cles)
+                    analyse_result = analyse_site(site, mots_cles, annee)
+                    if isinstance(analyse_result, dict) and 'error' in analyse_result:
+                        error_message = analyse_result['error']
+                        analyse_result = {}
+                    else:
+                        phrases = [p['texte'] for lst in analyse_result.values() for p in lst]
+                        if phrases:
+                            graph_url = generate_graph(phrases, mots_cles)
             else:
-                error_message = "Veuillez saisir une URL."        
+                error_message = "Veuillez saisir une URL."
         else:
             raise ValueError('Mode inconnu.')
     except Exception as e:
@@ -183,13 +205,13 @@ def analyser():
             paragraphs.append({
                 'texte': item.get('texte'),
                 'source': item.get('source', ''),
-                'date': item.get('date'), 
-                'keyword': keyword 
+                'date': format_display_date(item.get('date')),
+                'keyword': keyword
             })
-    
+
     session['paragraphs'] = paragraphs
     session['keywords'] = mots_cles
-    session['source'] = site if mode == 'site' else doc.filename
+    session['source'] = source_label
     session['date'] = str(datetime.now().date())
     session['type_analyse'] = mode
 
@@ -214,29 +236,22 @@ def resultats():
 
     resultats_analyse = json.loads(row['resultats'])
 
-    for kw, items in resultats_analyse.items():
-        for item in items:
-            d = item.get('date')
-            if isinstance(d, str):
-                try:
-                    item['date'] = datetime.fromisoformat(d)
-                except ValueError:
-                    item['date'] = None
-
     # Récupération des éléments de session
     paragraphs = session.get('paragraphs', [])
     keywords = session.get('keywords', [])
     source = session.get('source', '')
     date = session.get('date', '')
     type_analyse = session.get('type_analyse', '')
+    error_message = session.pop('error_message', None)
 
     #Pagination
-    page = request.args.get('page', 1, type=int)
+    page = request.args.get('page', 1, type=int) or 1
     per_page = 10
     total = len(paragraphs)
 
     if total > 0:
         total_pages = (total + per_page - 1) // per_page
+        page = max(1, min(page, total_pages))
         start = (page - 1) * per_page
         end = start + per_page
         paginated_paragraphs = paragraphs[start:end]
@@ -246,7 +261,9 @@ def resultats():
             'per_page': per_page,
             'total_pages': total_pages,
             'has_prev': page > 1,
-            'has_next': page < total_pages
+            'has_next': page < total_pages,
+            'prev_num': page - 1,
+            'next_num': page + 1
         }
     else:
         paginated_paragraphs = []
@@ -255,7 +272,9 @@ def resultats():
             'per_page': per_page,
             'total_pages': 1,
             'has_prev': False,
-            'has_next': False
+            'has_next': False,
+            'prev_num': 1,
+            'next_num': 1
         }
 
     return render_template(
@@ -269,9 +288,67 @@ def resultats():
         source=source,
         date=date,
         type_analyse=type_analyse,
-        pagination=pagination
+        pagination=pagination,
+        error_message=error_message
     )
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route('/actualites')
+def actualites():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    conn = get_db_connection()
+    articles = conn.execute('SELECT * FROM articles ORDER BY created_at DESC').fetchall()
+    conn.close()
+    return render_template('actualites.html', articles=articles)
+
+
+@app.route('/actualites/ajouter', methods=['GET', 'POST'])
+def ajouter_article():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    error_message = None
+    form = {'url': '', 'titre': '', 'contenu': '', 'image_url': '', 'date_publication': ''}
+
+    if request.method == 'POST':
+        action = request.form.get('action', 'enregistrer')
+        form['url'] = request.form.get('url', '').strip()
+        form['titre'] = request.form.get('titre', '').strip()
+        form['contenu'] = request.form.get('contenu', '').strip()
+        form['image_url'] = request.form.get('image_url', '').strip()
+        form['date_publication'] = request.form.get('date_publication', '').strip()
+
+        if action == 'previsualiser':
+            if not form['url']:
+                error_message = "Veuillez saisir une URL à pré-remplir."
+            else:
+                preview = extract_article_preview(form['url'])
+                if 'error' in preview:
+                    error_message = preview['error']
+                else:
+                    form['titre'] = preview.get('titre') or form['titre']
+                    form['contenu'] = preview.get('contenu') or form['contenu']
+                    form['image_url'] = preview.get('image_url') or form['image_url']
+                    form['date_publication'] = format_display_date(preview.get('date_publication'))
+            return render_template('ajouter_article.html', form=form, error_message=error_message)
+
+        # action == 'enregistrer'
+        if not form['titre']:
+            error_message = "Le titre est obligatoire."
+            return render_template('ajouter_article.html', form=form, error_message=error_message)
+
+        conn = get_db_connection()
+        conn.execute(
+            'INSERT INTO articles (user_id, titre, contenu, image_url, url, date_publication) VALUES (?, ?, ?, ?, ?, ?)',
+            (session['id'], form['titre'], form['contenu'], form['image_url'], form['url'], form['date_publication'])
+        )
+        conn.commit()
+        conn.close()
+        return redirect(url_for('actualites'))
+
+    return render_template('ajouter_article.html', form=form, error_message=error_message)
+
+
+if __name__ == '__main__':
+    app.run(debug=True, host='127.0.0.1', port=5000)
