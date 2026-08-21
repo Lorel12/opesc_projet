@@ -8,8 +8,8 @@
     <title>Résultats de l'analyse</title>
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleResultat.css') }}"> 
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleResultat.css') }}">
 </head>
 
 <body>
@@ -89,9 +89,9 @@
               {% if paragraphs %}
                   {% for item in paragraphs %}
                       <div class="paragraph mb-4">
-                          <h5>Mot-clé : "{{ item.keyword }}"</h5>
+                          <span class="badge badge-keyword mb-2">{{ item.keyword }}</span>
                           {% if mode == "site" %}
-                              <small class="text-muted d-block mb-1">
+                              <small class="d-block mb-2" style="color: var(--color-text-muted);">
                                 {% if item.source %}
                                     <strong>Source :</strong> <a href="{{ item.source }}" target="_blank">{{ item.source }}</a><br>
                                 {% endif %}
@@ -99,9 +99,9 @@
                                 {{ item.date or "Date inconnue" }}
                               </small>
                           {% endif %}
-                          <p>{{ item.texte }}</p>
+                          <p class="paragraph-text">{{ item.texte }}</p>
                           {% if item.themes %}
-                              <div>
+                              <div class="paragraph-themes">
                                   {% for theme in item.themes %}
                                       <span class="badge badge-secondary mr-1">{{ theme }}</span>
                                   {% endfor %}
