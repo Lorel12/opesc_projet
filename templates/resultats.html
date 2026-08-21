@@ -33,6 +33,9 @@
                             <a class="nav-link" href="{{ url_for('resultats') }}">Analyses</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('actualites') }}">Actualités</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
                         </li>
                     </ul>
@@ -68,11 +71,7 @@
                                     <strong>Source :</strong> <a href="{{ item.source }}" target="_blank">{{ item.source }}</a><br>
                                 {% endif %}
                                 <strong>Date :</strong>
-                                {% if item.date %}
-                                    {{ item.date.strftime("%d/%m/%Y") if item.date is not string else item.date }}
-                                {% else %}
-                                    Date inconnue
-                                {% endif %}
+                                {{ item.date or "Date inconnue" }}
                               </small>
                           {% endif %}
                           <p>{{ item.texte }}</p>
