@@ -5,28 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des utilisateurs</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <style>
-        body {
-            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-            font-size: 16px;
-            background-color: #f8f9fa;
-        }
         .users-card {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: var(--color-bg-card);
+            border: 1px solid var(--color-border-soft);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
             padding: 30px;
-        }
-        h1 {
-            font-weight: 700;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
         }
     </style>
 </head>
