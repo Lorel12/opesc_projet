@@ -20,6 +20,7 @@ from utils import extraction_du_texte, division_en_phrases, recherche_mots_cles,
 from scraper import extract_paragraphs_from_url, extract_links_from_url, analyse_site, extract_article_preview
 from graph import generate_graph
 from database import init_db, get_db_connection
+from themes import identifier_themes
 
 
 user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -180,6 +181,7 @@ def analyser():
         for item in items:
             if isinstance(item.get('date'), datetime):
                 item['date'] = item['date'].isoformat()
+            item['themes'] = identifier_themes(item.get('texte', ''))
 
     conn = get_db_connection()
     cur = conn.execute(
@@ -206,7 +208,8 @@ def analyser():
                 'texte': item.get('texte'),
                 'source': item.get('source', ''),
                 'date': format_display_date(item.get('date')),
-                'keyword': keyword
+                'keyword': keyword,
+                'themes': item.get('themes', [])
             })
 
     session['paragraphs'] = paragraphs
@@ -243,6 +246,13 @@ def resultats():
     date = session.get('date', '')
     type_analyse = session.get('type_analyse', '')
     error_message = session.pop('error_message', None)
+
+    # Synthèse thématique (Étape 2 du TDR)
+    theme_counts = defaultdict(int)
+    for p in paragraphs:
+        for theme in p.get('themes', []):
+            theme_counts[theme] += 1
+    themes_summary = sorted(theme_counts.items(), key=lambda t: t[1], reverse=True)
 
     #Pagination
     page = request.args.get('page', 1, type=int) or 1
@@ -289,7 +299,8 @@ def resultats():
         date=date,
         type_analyse=type_analyse,
         pagination=pagination,
-        error_message=error_message
+        error_message=error_message,
+        themes_summary=themes_summary
     )
 
 
