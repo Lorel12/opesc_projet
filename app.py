@@ -21,6 +21,7 @@ from scraper import extract_paragraphs_from_url, extract_links_from_url, analyse
 from graph import generate_graph
 from database import init_db, get_db_connection
 from themes import identifier_themes
+from resume import generer_resume
 
 
 user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -300,8 +301,39 @@ def resultats():
         type_analyse=type_analyse,
         pagination=pagination,
         error_message=error_message,
-        themes_summary=themes_summary
+        themes_summary=themes_summary,
+        resume=row['resume'],
+        analysis_id=aid
     )
+
+
+@app.route('/resultats/resume', methods=['POST'])
+def generer_resume_analyse():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    aid = session.get('analysis_id')
+    if not aid:
+        return redirect(url_for('resultats'))
+
+    conn = get_db_connection()
+    row = conn.execute('SELECT * FROM analyses WHERE id=?', (aid,)).fetchone()
+    if not row:
+        conn.close()
+        return redirect(url_for('resultats'))
+
+    resultats_analyse = json.loads(row['resultats'])
+    textes = [item.get('texte', '') for items in resultats_analyse.values() for item in items]
+
+    resultat = generer_resume(textes, row['mots_cles'])
+    if 'error' in resultat:
+        session['error_message'] = resultat['error']
+    else:
+        conn.execute('UPDATE analyses SET resume = ? WHERE id = ?', (resultat['resume'], aid))
+        conn.commit()
+
+    conn.close()
+    return redirect(url_for('resultats'))
 
 
 @app.route('/actualites')
