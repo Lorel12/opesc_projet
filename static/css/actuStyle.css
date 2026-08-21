@@ -1,5 +1,5 @@
 *{
-    font-family: 'Times New Roman', Times, serif;
+    font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
     font-size: 16px;
 }
 
@@ -15,15 +15,18 @@
 
 .news-card {
     border: none;
+    border-radius: 12px;
+    overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
 .news-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
 .news-card-img {
@@ -73,7 +76,7 @@
 }
 
 .add-article-btn {
-    background-color: #343a40;
+    background-color: #007bff;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -82,5 +85,6 @@
 }
 
 .add-article-btn:hover {
-    background-color: #1e7e34;
+    background-color: #0056b3;
+    color: white;
 }
