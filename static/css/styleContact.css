@@ -1,7 +1,7 @@
 *{
     margin: 0;
     padding: 0;
-    font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+    font-family:'Times New Roman', Times, serif;
 }
 html, body {
     height: 100%;
@@ -28,13 +28,14 @@ main {
     max-width: 600px;
     margin: 0 auto;
     padding: 30px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
 }
 
 label {
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 5px;
 }
 
