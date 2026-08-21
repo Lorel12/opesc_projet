@@ -27,6 +27,7 @@
             <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Accueil</a></li>
             <li class="nav-item active"><a class="nav-link" href="{{ url_for('previsions') }}">Recherche avancée</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('resultats') }}">Analyses</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('actualites') }}">Actualités</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
           </ul>
         </div>
@@ -85,13 +86,12 @@
               <option value="https://www.afdb.org/fr/pays-afrique-centrale/cameroun">Perspectives économiques au Cameroun</option>
               <option value="https://journaldiapason.com">Diapason Media Group</option>
               <option value="https://www.imf.org/fr/Countries/ResRep/CMR">FMI</option>
-            </select>
-            <input type="hidden" name="mode" value="site"><br>
+            </select><br>
             <label for="site">Entrez l'URL à scraper :</label><br>
             <input type="url" name="site_url" id="site_url" placeholder="https://www.exemple.com"  class="form-control"><br>
-           
+
             <label for="annee">Annee</label>
-            <input type="text" name="annee" placeholder="Exemple : 2025" class="form-control">
+            <input type="text" name="annee" id="annee" placeholder="Exemple : 2025" class="form-control">
 
           </div>
 
@@ -129,6 +129,7 @@
                     <li><a href="{{ url_for('home') }}" class="text-white">Accueil</a></li>
                     <li><a href="{{ url_for('previsions') }}" class="text-white">Recherche avancée</a></li>
                     <li><a href="{{ url_for('resultats') }}" class="text-white">Analyses</a></li>
+                    <li><a href="{{ url_for('actualites') }}" class="text-white">Actualités</a></li>
                     <li><a href="{{ url_for('contact') }}" class="text-white">Contact</a></li>
                 </ul>
             </div>
