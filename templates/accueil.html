@@ -11,14 +11,50 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("{{ url_for('static', filename='images/mon_image.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(255, 255, 255, 0.06) 0%, transparent 45%),
+                linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1e40af 100%);
+            padding: 110px 0;
             text-align: center;
         }
 
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+            background-size: 26px 26px;
+            pointer-events: none;
+        }
+
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section h1,
+        .hero-section p {
+            color: #ffffff;
+        }
+
+        .hero-section .lead {
+            color: #f0f0f0;
+        }
+
+        .hero-section .btn-primary {
+            background-color: #ffffff;
+            border-color: #ffffff;
+            color: #1e40af;
+        }
+
+        .hero-section .btn-primary:hover {
+            background-color: #f0f0f0;
+            border-color: #f0f0f0;
+            color: #1e3a8a;
+        }
     </style>
 </head>
 
