@@ -3,17 +3,17 @@
    propres à chaque page complètent ces règles de base. */
 
 :root {
-    --color-text: #333333;
-    --color-text-muted: #666666;
-    --color-border-soft: #e5e5e5;
+    --color-text: #2d3748;
+    --color-text-muted: #616161;
+    --color-border-soft: #e5e7eb;
     --color-bg-page: #f8f9fa;
     --color-bg-card: #ffffff;
-    --color-accent: #007bff;
-    --color-accent-hover: #0056b3;
+    --color-accent: #1e40af;
+    --color-accent-hover: #1e3a8a;
     --radius-lg: 16px;
     --radius-md: 10px;
-    --shadow-soft: 0 2px 16px rgba(0, 0, 0, 0.06);
-    --shadow-soft-hover: 0 10px 28px rgba(0, 0, 0, 0.09);
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-soft-hover: 0 10px 24px rgba(0, 0, 0, 0.08);
 }
 
 body {
@@ -23,6 +23,14 @@ body {
     line-height: 1.7;
     color: var(--color-text);
     background-color: var(--color-bg-page);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Pied de page toujours ancré en bas, même sur les pages au contenu court */
+main {
+    flex: 1;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -89,7 +97,7 @@ a:hover {
 
 .form-control:focus {
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.12);
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.12);
 }
 
 .badge {
@@ -97,6 +105,10 @@ a:hover {
     font-weight: 400;
     padding: 0.4em 0.8em;
     letter-spacing: 0.01em;
+}
+
+.badge-primary {
+    background-color: var(--color-accent);
 }
 
 /* En-tête et pied de page communs */
@@ -110,6 +122,7 @@ footer a.text-white:hover {
 }
 
 footer h5 {
+    color: #ffffff;
     font-weight: 700;
     letter-spacing: 0.02em;
 }
