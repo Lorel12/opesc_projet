@@ -32,6 +32,10 @@ def init_db():
         date_publication TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
+    try:
+        c.execute('ALTER TABLE analyses ADD COLUMN resume TEXT')
+    except sqlite3.OperationalError:
+        pass  # colonne déjà existante
     conn.commit()
     conn.close()
 

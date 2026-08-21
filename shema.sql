@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS analyses (
     mode TEXT,
     resultats TEXT,
     graph_url TEXT,
+    resume TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
