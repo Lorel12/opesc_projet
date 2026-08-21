@@ -22,13 +22,7 @@
             <tr>
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
-                <td>
-    {% if user.created_at %}
-        {{ user.created_at.strftime("%d/%m/%Y %H:%M") }}
-    {% else %}
-        Date inconnue
-    {% endif %}
-</td>
+                <td>{{ user.created_at }}</td>
             </tr>
             {% endfor %}
         </tbody>
