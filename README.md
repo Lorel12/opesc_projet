@@ -19,6 +19,8 @@ Une application web interactive développée avec **Flask** pour collecter et an
 - 📄 Analyse de documents (PDF, Word, texte) par recherche de mots-clés
 - 🌐 Web scraping de sites économiques (sites prédéfinis ou URL libre), avec filtre par année de publication
 - 📈 Graphique de fréquence des mots-clés trouvés
+- 🏷️ Classification thématique automatique des paragraphes trouvés (croissance, emploi, inflation, fiscalité...)
+- 🤖 Synthèse automatique par IA (Google Gemini) des résultats d'une analyse
 - 📰 Actualités économiques : ajout d'articles (manuel ou pré-rempli automatiquement depuis une URL)
 - 📬 Formulaire de contact
 
@@ -40,7 +42,19 @@ source venv/bin/activate     # Linux/macOS
 pip install -r requirements.txt
 ```
 
-3. **Lancer l'application :**
+3. **(Optionnel) Configurer la clé API Gemini pour la synthèse automatique :**
+
+La synthèse par IA (bouton "Générer une synthèse par IA" sur la page des résultats) nécessite une clé API Google Gemini gratuite, obtenue sur [aistudio.google.com](https://aistudio.google.com), à définir dans la variable d'environnement `GEMINI_API_KEY` avant de lancer l'application :
+
+```bash
+set GEMINI_API_KEY=votre-cle-api        # Windows (cmd)
+$env:GEMINI_API_KEY="votre-cle-api"     # Windows (PowerShell)
+export GEMINI_API_KEY=votre-cle-api     # Linux/macOS
+```
+
+Sans cette variable, le reste de l'application fonctionne normalement ; seul le bouton de synthèse renverra un message d'erreur explicite.
+
+4. **Lancer l'application :**
 
 ```bash
 python app.py
@@ -55,6 +69,8 @@ La base de données SQLite (`database.db`) et ses tables sont créées automatiq
 - `app.py` : routes Flask et logique applicative
 - `scraper.py` : web scraping (extraction de paragraphes, liens, aperçus d'articles)
 - `utils.py` : extraction de texte (PDF/Word/txt), découpage en phrases, recherche de mots-clés, formatage des dates
+- `themes.py` : classification thématique des paragraphes trouvés
+- `resume.py` : synthèse automatique via l'API Google Gemini
 - `graph.py` : génération du graphique de fréquence des mots-clés
 - `database.py` / `shema.sql` : schéma et connexion SQLite
 - `templates/` : pages HTML (Jinja2)
