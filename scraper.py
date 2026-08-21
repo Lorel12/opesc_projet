@@ -58,11 +58,34 @@ def can_scrape(url):
         return True
     return rp.can_fetch(user_agent, url)
 
+def extract_published_date(soup):
+    """Tente de récupérer la date de publication d'une page depuis ses balises meta/time."""
+    date_str = None
+    date_tag = soup.find('meta', {'property': 'article:published_time'})
+    if date_tag and 'content' in date_tag.attrs:
+        date_str = date_tag['content']
+    else:
+        time_tag = soup.find('time')
+        if time_tag and time_tag.has_attr('datetime'):
+            date_str = time_tag['datetime']
+
+    try:
+        if date_str:
+            date_str = date_str.replace('CEST', '').replace('CET', '').strip()
+            if re.match(r'^\d{4}-\d{2}-\d{2}\d{2}:\d{2}:\d{2}', date_str):
+                date_str = date_str[:10] + 'T' + date_str[10:]
+            return parser.parse(date_str)
+        return None
+    except Exception as ex:
+        print(f"[Erreur date] Conversion échouée : '{date_str}' — {ex}")
+        return None
+
+
 def extract_paragraphs_from_url(url):
     if not can_scrape(url):
         print(f"[robots.txt] Scraping interdit pour {url}")
         return []  # On ne scrape pas les URL interdites
-     
+
     try:
         response = requests.get(url, headers=headers, timeout=20)
         response.raise_for_status()
@@ -78,30 +101,10 @@ def extract_paragraphs_from_url(url):
         except Exception as e:
             print(f"[Erreur parsing HTML] {url} : {e}")
             return []
-            
+
         paragraphs_data = []
 
-        # Tentative de récupération de la date de publication
-        date_str = None
-        date_tag = soup.find('meta', {'property': 'article:published_time'})
-        if date_tag and 'content' in date_tag.attrs:
-            date_str = date_tag['content']
-        else:
-            time_tag = soup.find('time')
-            if time_tag and time_tag.has_attr('datetime'):
-                date_str = time_tag['datetime']
-
-        try:
-            if date_str:
-                date_str = date_str.replace('CEST', '').replace('CET', '').strip()
-                if re.match(r'^\d{4}-\d{2}-\d{2}\d{2}:\d{2}:\d{2}', date_str):
-                    date_str = date_str[:10] + 'T' + date_str[10:]
-                date_obj = parser.parse(date_str)
-            else:
-                date_obj = None
-        except Exception as ex:
-            print(f"[Erreur date] Conversion échouée : '{date_str}' — {ex}")
-            date_obj = None
+        date_obj = extract_published_date(soup)
 
         # Extraction des paragraphes
         for p in soup.find_all('p'):
@@ -165,7 +168,7 @@ def analyse_site(url, keywords, annee=None):
 
         def process_paragraphs(paragraphs_data, source_url):
             for p_data in paragraphs_data:
-                texte = p_data.get('texte', '').lower()
+                texte = p_data.get('texte', '')
                 if annee:
                     date = p_data.get('date')
                     if isinstance(date, datetime):
@@ -174,7 +177,7 @@ def analyse_site(url, keywords, annee=None):
                     else:
                         continue  # Année demandée mais date invalide
                 for keyword in keywords_list:
-                    if keyword in texte:
+                    if re.search(rf'\b{re.escape(keyword)}\b', texte, re.IGNORECASE):
                         p_data.setdefault('source', source_url)
                         p_data.setdefault('date', None)
                         resultat[keyword].append(p_data)
@@ -195,3 +198,54 @@ def analyse_site(url, keywords, annee=None):
         return {"error": f"Erreur inattendue lors de l'analyse de {url} : {e}"}
 
     return dict(resultat)
+
+
+def extract_article_preview(url):
+    """Récupère titre, extrait, image et date de publication d'une page pour alimenter les Actualités."""
+    if not can_scrape(url):
+        return {"error": f"Le scraping de {url} est interdit par robots.txt."}
+
+    try:
+        response = requests.get(url, headers=headers, timeout=20)
+        response.raise_for_status()
+
+        content_type = response.headers.get('Content-Type', '')
+        if 'html' not in content_type:
+            return {"error": f"URL non HTML : {url}"}
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        titre_tag = soup.find('meta', {'property': 'og:title'})
+        if titre_tag and titre_tag.get('content'):
+            titre = titre_tag['content'].strip()
+        elif soup.title and soup.title.string:
+            titre = soup.title.string.strip()
+        else:
+            titre = url
+
+        contenu = ""
+        for p in soup.find_all('p'):
+            text = p.get_text(strip=True)
+            if len(text) > 80:
+                contenu = text
+                break
+
+        image_tag = soup.find('meta', {'property': 'og:image'})
+        if image_tag and image_tag.get('content'):
+            image_url = urljoin(url, image_tag['content'])
+        else:
+            img_tag = soup.find('img')
+            image_url = urljoin(url, img_tag['src']) if img_tag and img_tag.get('src') else None
+
+        date_obj = extract_published_date(soup)
+
+        return {
+            'titre': titre,
+            'contenu': contenu,
+            'image_url': image_url,
+            'date_publication': date_obj,
+            'url': url,
+        }
+
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Erreur d'accès à l'URL {url} : {e}"}
