@@ -10,6 +10,9 @@ logs.txt
 uploads/*
 static/images/graph_*.png
 
+# Secrets locaux (jamais commités ; sur Render, utiliser le tableau de bord Environment)
+.env
+
 # Fichiers d'éditeur / OS
 .vscode/
 .idea/
