@@ -72,7 +72,7 @@
             <div class="result-section">
               <h2>Synthèse automatique</h2>
               {% if resume %}
-                <div class="alert alert-light border" style="white-space: pre-line;">{{ resume }}</div>
+                <div class="resume-box">{{ resume | markdown_leger }}</div>
                 <form method="POST" action="{{ url_for('generer_resume_analyse') }}">
                   <button type="submit" class="btn btn-outline-secondary btn-sm">Régénérer la synthèse</button>
                 </form>

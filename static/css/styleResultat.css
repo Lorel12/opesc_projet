@@ -71,6 +71,34 @@ h1 {
     font-weight: 400;
 }
 
+.resume-box {
+    background-color: #eef2fb;
+    border: 1px solid var(--color-border-soft);
+    border-radius: 14px;
+    padding: 20px 24px;
+    color: var(--color-text);
+    margin-bottom: 16px;
+}
+
+.resume-box p {
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.resume-box p:last-child {
+    margin-bottom: 0;
+}
+
+.resume-box ul {
+    margin-bottom: 12px;
+    padding-left: 22px;
+}
+
+.resume-box li {
+    color: var(--color-text);
+    margin-bottom: 6px;
+}
+
 .error {
     color: #842029;
     border: 1px solid #f5c2c7;

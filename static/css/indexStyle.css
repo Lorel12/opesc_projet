@@ -1,6 +1,14 @@
-*{
-    font-family:'Times New Roman', Times, serif;
+/* Style Global */
+* {
+    font-family: 'Times New Roman', Times, serif;
+    box-sizing: border-box;
 }
+
+body {
+    color: #333333; /* Texte assombri doux au lieu d'un noir pur */
+    background-color: #fcfcfc;
+}
+
 .navbar .container {
     display: flex;
     justify-content: space-between;
@@ -12,14 +20,50 @@
     font-weight: 700;
     letter-spacing: -0.01em;
     margin-bottom: 20px;
+    color: #ffffff; /* Assure la lisibilité sur fond sombre */
 }
 
+/* Section Cartes & Alignement Strict */
 .feature-section {
     padding: 80px 0;
 }
 
+/* Force l'alignement en hauteur de toutes les colonnes de la grille */
+.feature-section .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.feature-section .col-md-4 {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Style Soft Premium des Cartes */
+.feature-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
 .feature-card .card-body {
     padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1 1 auto;
 }
 
 .feature-icon-wrapper {
@@ -31,6 +75,7 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
+    flex-shrink: 0;
 }
 
 .feature-icon {
@@ -40,9 +85,17 @@
 
 .feature-card .card-title {
     font-weight: 700;
+    color: #1f2937;
     margin-bottom: 12px;
 }
 
+.feature-card .card-text {
+    color: #6b7280; /* Gris secondaire élégant */
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Call to Action */
 .call-to-action {
     background-color: #f8f9fa;
     padding: 50px 0;

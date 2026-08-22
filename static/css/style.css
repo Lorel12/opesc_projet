@@ -1,37 +1,42 @@
 * {
     box-sizing: border-box;
-    font-family:'Times New Roman', Times, serif;
+    font-family: 'Times New Roman', Times, serif;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
 body {
     background: linear-gradient(135deg, #f8f9fa 0%, #e6f0ff 100%);
     margin: 0;
     min-height: 100vh;
 }
+
 .login, .register {
     max-width: 400px;
     width: 90%;
     margin: 80px auto;
     padding: 30px 20px;
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-soft, 0 4px 10px rgba(0,0,0,0.1));
     background: #fff;
-    border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-soft, #e2e8f0);
+    border-radius: var(--radius-lg, 8px);
 }
+
 .login h1, .register h1 {
     text-align: center;
-    color: var(--color-text);
+    color: var(--color-text, #333);
     font-weight: 700;
     font-size: 24px;
     padding: 0 0 20px 0;
-    border-bottom: 1px solid var(--color-border-soft);
+    border-bottom: 1px solid var(--color-border-soft, #e2e8f0);
 }
+
 .login .links, .register .links {
     display: flex;
     padding: 0 15px;
 }
+
 .login .links a, .register .links a {
     color: #adb2ba;
     text-decoration: none;
@@ -39,94 +44,132 @@ body {
     padding: 0 10px 10px 10px;
     font-weight: bold;
 }
+
 .login .links a:hover, .register .links a:hover {
     color: #9da3ac;
 }
+
 .login .links a.active, .register .links a.active {
     border-bottom: 3px solid #1e40af;
     color: #1e40af;
 }
+
 .login form, .register form {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     padding-top: 20px;
 }
+
+/* Nouveau conteneur pour aligner correctement chaque label avec son input */
+.login form .field, .register form .field {
+    display: flex;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
 .login form label, .register form label {
     display: flex;
+    flex: 0 0 50px;
     justify-content: center;
     align-items: center;
-    width: 50px;
     height: 50px;
     background-color: #1e40af;
     color: #ffffff;
+    border-radius: var(--radius-md, 5px) 0 0 var(--radius-md, 5px);
+    margin-bottom: 0;
 }
-.login form input[type="password"], .login form input[type="text"], .login form input[type="email"], .register form input[type="password"], .register form input[type="text"], .register form input[type="email"] {
-    width: 310px;
+
+.login form input[type="password"], 
+.login form input[type="text"], 
+.login form input[type="email"], 
+.register form input[type="password"], 
+.register form input[type="text"], 
+.register form input[type="email"] {
+    flex: 1 1 auto;
+    min-width: 0;
     height: 50px;
     border: 1px solid #dee0e4;
-    margin-bottom: 20px;
+    border-left: none;
+    border-radius: 0 var(--radius-md, 5px) var(--radius-md, 5px) 0;
+    margin-bottom: 0;
     padding: 0 15px;
 }
+
+.msg {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
 .login form input[type="submit"], .register form input[type="submit"] {
     width: 100%;
     padding: 15px;
-    margin-top: 20px;
+    margin-top: 10px;
     background-color: #1e40af;
     border: 0;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-md, 5px);
     cursor: pointer;
     font-weight: bold;
     color: #ffffff;
     transition: background-color 0.2s, transform 0.15s ease;
 }
+
 .login form input[type="submit"]:hover, .register form input[type="submit"]:hover {
     background-color: #1e3a8a;
     transform: translateY(-1px);
 }
+
 .navtop {
     background-color: #2f3947;
     height: 60px;
     width: 100%;
     border: 0;
 }
+
 .navtop div {
     display: flex;
     margin: 0 auto;
     width: 1000px;
     height: 100%;
 }
+
 .navtop div h1, .navtop div a {
     display: inline-flex;
     align-items: center;
 }
+
 .navtop div h1 {
     flex: 1;
     font-size: 24px;
     padding: 0;
-   margin: 0;
+    margin: 0;
     color: #eaebed;
     font-weight: normal;
 }
+
 .navtop div a {
     padding: 0 20px;
     text-decoration: none;
     color: #c1c4c8;
     font-weight: bold;
 }
+
 .navtop div a i {
     padding: 2px 8px 0 0;
 }
+
 .navtop div a:hover {
     color: #eaebed;
 }
+
 body.loggedin {
     background-color: #f3f4f7;
 }
+
 .content {
     width: 1000px;
     margin: 0 auto;
 }
+
 .content h2 {
     margin: 0;
     padding: 25px 0;
@@ -134,21 +177,25 @@ body.loggedin {
     border-bottom: 1px solid #e0e0e3;
     color: #4a536e;
 }
+
 .content > p, .content > div {
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
     margin: 25px 0;
     padding: 25px;
-  background-color: #fff;
+    background-color: #fff;
 }
+
 .content > p table td, .content > div table td {
-  padding: 5px;
+    padding: 5px;
 }
+
 .content > p table td:first-child, .content > div table td:first-child {
-  font-weight: bold;
-  color: #4a536e;
-  padding-right: 15px;
+    font-weight: bold;
+    color: #4a536e;
+    padding-right: 15px;
 }
+
 .content > div p {
-  padding: 5px;
-  margin: 0 0 10px 0;
+    padding: 5px;
+    margin: 0 0 10px 0;
 }
