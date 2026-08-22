@@ -2,10 +2,11 @@ Flask==2.3.3
 requests==2.31.0
 beautifulsoup4==4.12.3
 pandas==2.2.1
-matplotlib==3.8.4
+matplotlib==3.11.1
 PyPDF2==3.0.1
 python-docx==1.1.0
 python-dateutil==2.9.0.post0
 Werkzeug==2.3.8
 gunicorn
 pdfplumber
+python-dotenv
