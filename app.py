@@ -15,8 +15,11 @@ import os, json, sqlite3
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from dateutil import parser
+from dotenv import load_dotenv
 
-from utils import extraction_du_texte, division_en_phrases, recherche_mots_cles, format_display_date
+load_dotenv()
+
+from utils import extraction_du_texte, division_en_phrases, recherche_mots_cles, format_display_date, rendre_markdown_leger
 from scraper import extract_paragraphs_from_url, extract_links_from_url, analyse_site, extract_article_preview
 from graph import generate_graph
 from database import init_db, get_db_connection
@@ -31,6 +34,7 @@ app = Flask(__name__)
 app.secret_key = 'your secret key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+app.jinja_env.filters['markdown_leger'] = rendre_markdown_leger
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="requests")

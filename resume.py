@@ -7,7 +7,7 @@ import requests
 GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 MAX_CORPUS_CHARS = 80000
-
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
 def generer_resume(paragraphes, mots_cles):
     """Génère une synthèse en français à partir d'une liste de textes trouvés.

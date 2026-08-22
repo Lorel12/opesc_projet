@@ -15,6 +15,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from dateutil import parser
 import pdfplumber
+from markupsafe import Markup, escape
 
 # Configuration du logger
 logging.basicConfig(filename='logs.txt', level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s')
@@ -116,3 +117,53 @@ def format_display_date(value):
         except ValueError:
             return value
     return "Date inconnue"
+
+# ✨ Fonction 5 : Rendu léger et sûr du Markdown renvoyé par l'IA (gras, puces)
+def rendre_markdown_leger(texte):
+    """Convertit le sous-ensemble Markdown produit par l'IA (gras, listes à puces)
+    en HTML minimal. Le texte est échappé avant toute insertion de balise, donc
+    aucun contenu du texte source (y compris du HTML) ne peut être interprété."""
+    if not texte:
+        return Markup("")
+
+    def appliquer_gras(ligne_echappee):
+        return re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', ligne_echappee)
+
+    html_parts = []
+    paragraph_lines = []
+    in_list = False
+
+    def flush_paragraph():
+        if paragraph_lines:
+            contenu = " ".join(paragraph_lines).strip()
+            if contenu:
+                html_parts.append("<p>%s</p>" % appliquer_gras(contenu))
+            paragraph_lines.clear()
+
+    for ligne in str(texte).split("\n"):
+        ligne_echappee = str(escape(ligne.strip()))
+        if not ligne_echappee:
+            flush_paragraph()
+            if in_list:
+                html_parts.append("</ul>")
+                in_list = False
+            continue
+
+        m = re.match(r'^[\*\-]\s+(.*)', ligne_echappee)
+        if m:
+            flush_paragraph()
+            if not in_list:
+                html_parts.append("<ul>")
+                in_list = True
+            html_parts.append("<li>%s</li>" % appliquer_gras(m.group(1)))
+        else:
+            if in_list:
+                html_parts.append("</ul>")
+                in_list = False
+            paragraph_lines.append(ligne_echappee)
+
+    flush_paragraph()
+    if in_list:
+        html_parts.append("</ul>")
+
+    return Markup("".join(html_parts))
