@@ -126,3 +126,25 @@ footer h5 {
     font-weight: 700;
     letter-spacing: 0.02em;
 }
+
+/* Les <p> de footer héritent sinon de la couleur de texte par défaut
+   (foncée), illisible sur le fond sombre du footer. */
+footer p {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Images toujours contenues dans leur conteneur, jamais de débordement horizontal */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Ajustements mobile communs à toutes les pages */
+@media (max-width: 768px) {
+    .navbar-brand {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 65%;
+    }
+}

@@ -8,16 +8,6 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleContact.css') }}">
-    <style>
-        @media (max-width: 768px) {
-            .navbar-brand {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 70%;
-            }
-        }
-    </style>
 </head>
 <body>
 <header>
@@ -69,25 +59,15 @@
 <footer class="bg-dark text-white pt-4 pb-2">
     <div class="container">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-6 mb-3 mb-md-0">
                 <h5>Contact</h5>
                 <ul class="list-unstyled">
                     <li><a href="mailto:abdelazizjunmbe@gmail.com" class="text-white">Email: abdelazizjunmbe@gmail.com</a></li>
                     <li><a href="tel:+237698977560" class="text-white">Téléphone: +237 698 977 560</a></li>
-                    <li><span>Adresse: Immeuble Amakam, Rond Point Hilton</span></li>
+                    <li><span class="text-white">Adresse: Immeuble Amakam, Rond Point Hilton</span></li>
                 </ul>
             </div>
-            <div class="col-md-4">
-                <h5>Liens</h5>
-                <ul class="list-unstyled">
-                    <li><a href="{{ url_for('home') }}" class="text-white">Accueil</a></li>
-                    <li><a href="{{ url_for('previsions') }}" class="text-white">Recherche avancée</a></li>
-                    <li><a href="{{ url_for('resultats') }}" class="text-white">Analyses</a></li>
-                    <li><a href="{{ url_for('actualites') }}" class="text-white">Actualités</a></li>
-                    <li><a href="{{ url_for('contact') }}" class="text-white">Contact</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <h5>À propos de nous</h5>
                 <p>Système intégré de surveillance, de prévision et de contrôle des risques économiques.</p>
             </div>

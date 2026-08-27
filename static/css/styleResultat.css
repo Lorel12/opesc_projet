@@ -116,6 +116,7 @@ h1 {
 @media (max-width: 768px) {
     .containerDiv {
         width: 90%;
+        margin: 20px auto;
         padding: 20px;
     }
     h1 {
@@ -135,7 +136,16 @@ h1 {
         padding: 18px;
     }
 
+    .resume-box {
+        padding: 16px 18px;
+    }
+
     .error, .graph {
         font-size: 14px;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        row-gap: 6px;
     }
 }

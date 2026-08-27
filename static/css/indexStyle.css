@@ -101,3 +101,25 @@ body {
     padding: 50px 0;
     text-align: center;
 }
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 1.9rem;
+    }
+
+    .feature-section {
+        padding: 40px 0;
+    }
+
+    .feature-card .card-body {
+        padding: 28px 20px;
+    }
+
+    .call-to-action {
+        padding: 35px 0;
+    }
+
+    .call-to-action h2 {
+        font-size: 1.4rem;
+    }
+}
