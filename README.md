@@ -1,8 +1,8 @@
-# 📊 Prévisions Économiques Cameroun — Web App
+# Prévisions Économiques Cameroun — Web App
 
 Une application web interactive développée avec **Flask** pour collecter et analyser des informations économiques sur le Cameroun. Le projet combine web scraping, analyse documentaire (PDF/Word/texte) et recherche par mots-clés, dans le cadre de l'exploitation du Big Data pour l'analyse économique (DGEPIP/MINEPAT).
 
-## 🧰 Technologies utilisées
+## Technologies utilisées
 
 - **Python / Flask** : Backend web
 - **HTML / CSS (Bootstrap 4)** : Frontend responsive
