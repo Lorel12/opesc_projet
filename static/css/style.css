@@ -1,121 +1,218 @@
 * {
     box-sizing: border-box;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 16px;
+    font-family: inherit;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e6f0ff 100%);
     margin: 0;
     min-height: 100vh;
+    background:
+        radial-gradient(ellipse at 12% 8%, rgba(220, 232, 243, 0.7), transparent 34rem),
+        #f5f7fa;
 }
 
 .login, .register {
-    max-width: 400px;
-    width: 90%;
-    margin: 80px auto;
-    padding: 30px 20px;
-    box-shadow: var(--shadow-soft, 0 4px 10px rgba(0,0,0,0.1));
+    max-width: 430px;
+    width: min(92%, 430px);
+    margin: clamp(32px, 8vh, 76px) auto;
+    padding: 32px clamp(22px, 6vw, 36px);
+    font-family: Arial, "Segoe UI", sans-serif;
+    box-shadow: 0 12px 34px rgba(28, 48, 68, 0.09);
     background: #fff;
-    border: 1px solid var(--color-border-soft, #e2e8f0);
-    border-radius: var(--radius-lg, 8px);
+    border: 1px solid var(--color-border-soft);
+    border-radius: 16px;
 }
 
 .login h1, .register h1 {
-    text-align: center;
-    color: var(--color-text, #333);
+    margin: 0 0 8px;
+    color: var(--color-text);
+    font-size: 1.8rem;
     font-weight: 700;
-    font-size: 24px;
-    padding: 0 0 20px 0;
-    border-bottom: 1px solid var(--color-border-soft, #e2e8f0);
+}
+
+.auth-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    color: var(--color-accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.auth-intro {
+    margin: 0 0 24px;
+    color: var(--color-text-muted);
+    line-height: 1.55;
 }
 
 .login .links, .register .links {
     display: flex;
-    padding: 0 15px;
+    gap: 8px;
+    padding: 5px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    background: #f1f5f7;
 }
 
 .login .links a, .register .links a {
-    color: #adb2ba;
+    flex: 1;
+    color: var(--color-text-muted);
+    text-align: center;
     text-decoration: none;
-    display: inline-flex;
-    padding: 0 10px 10px 10px;
-    font-weight: bold;
+    padding: 10px 12px;
+    border-radius: 9px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .login .links a:hover, .register .links a:hover {
-    color: #9da3ac;
+    color: var(--color-accent);
 }
 
 .login .links a.active, .register .links a.active {
-    border-bottom: 3px solid #1e40af;
-    color: #1e40af;
+    color: var(--color-accent);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(24, 49, 71, 0.08);
 }
 
 .login form, .register form {
     display: flex;
     flex-wrap: wrap;
-    padding-top: 20px;
+    padding-top: 0;
 }
 
-/* Nouveau conteneur pour aligner correctement chaque label avec son input */
 .login form .field, .register form .field {
     display: flex;
+    align-items: stretch;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .login form label, .register form label {
     display: flex;
-    flex: 0 0 50px;
+    flex: 0 0 48px;
     justify-content: center;
     align-items: center;
-    height: 50px;
-    background-color: #1e40af;
-    color: #ffffff;
-    border-radius: var(--radius-md, 5px) 0 0 var(--radius-md, 5px);
+    min-height: 50px;
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
+    border: 1px solid #e4eaf0;
+    border-right: 0;
+    border-radius: 12px 0 0 12px;
     margin-bottom: 0;
 }
 
-.login form input[type="password"], 
-.login form input[type="text"], 
-.login form input[type="email"], 
-.register form input[type="password"], 
-.register form input[type="text"], 
+.login form input[type="password"],
+.login form input[type="text"],
+.login form input[type="email"],
+.register form input[type="password"],
+.register form input[type="text"],
 .register form input[type="email"] {
     flex: 1 1 auto;
     min-width: 0;
     height: 50px;
-    border: 1px solid #dee0e4;
-    border-left: none;
-    border-radius: 0 var(--radius-md, 5px) var(--radius-md, 5px) 0;
+    border: 1px solid #e4eaf0;
+    border-left: 0;
+    border-radius: 0 12px 12px 0;
     margin-bottom: 0;
-    padding: 0 15px;
+    padding: 0 14px;
+    color: var(--color-text);
+    background: #fff;
+    font-size: 0.96rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login form .field:focus-within label,
+.register form .field:focus-within label {
+    border-color: var(--color-accent);
+}
+
+.login form .field:focus-within input,
+.register form .field:focus-within input {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(36, 91, 143, 0.1);
+    outline: 0;
+}
+
+.password-toggle {
+    display: inline-flex;
+    flex: 0 0 48px;
+    align-items: center;
+    justify-content: center;
+    margin-left: -1px;
+    border: 1px solid #e4eaf0;
+    border-left: 0;
+    border-radius: 0 12px 12px 0;
+    color: #667789;
+    background: #fff;
+    cursor: pointer;
+}
+
+.password-toggle:hover {
+    color: var(--color-accent);
+    background: #f7f9fb;
+}
+
+.password-toggle:focus-visible {
+    z-index: 1;
+    outline-offset: -3px;
+}
+
+.field-password input {
+    border-radius: 0;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .msg {
     width: 100%;
-    margin-bottom: 10px;
+    margin: 0 0 12px;
+    color: #a13d36;
+    font-size: 0.9rem;
+}
+
+.auth-note {
+    width: 100%;
+    margin: -3px 0 16px;
+    color: var(--color-text-muted);
+    font-size: 0.84rem;
 }
 
 .login form input[type="submit"], .register form input[type="submit"] {
     width: 100%;
-    padding: 15px;
-    margin-top: 10px;
-    background-color: #1e40af;
+    min-height: 50px;
+    padding: 13px 18px;
+    margin-top: 4px;
+    background-color: var(--color-accent);
     border: 0;
-    border-radius: var(--radius-md, 5px);
+    border-radius: 12px;
     cursor: pointer;
-    font-weight: bold;
+    font-size: 0.98rem;
+    font-weight: 700;
     color: #ffffff;
-    transition: background-color 0.2s, transform 0.15s ease;
+    transition: background-color 0.2s, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .login form input[type="submit"]:hover, .register form input[type="submit"]:hover {
-    background-color: #1e3a8a;
+    background-color: var(--color-accent-hover);
     transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(36, 91, 143, 0.2);
 }
 
 .navtop {
@@ -202,6 +299,13 @@ body.loggedin {
 
 @media (max-width: 768px) {
     .login, .register {
-        margin: 30px auto;
+        margin: 24px auto;
+    }
+}
+
+@media (max-width: 400px) {
+    .login, .register {
+        padding: 28px 20px;
+        border-radius: 18px;
     }
 }

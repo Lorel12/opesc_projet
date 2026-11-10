@@ -1,45 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="utf-8">
-        <title>Register</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#18334e">
+        <title>Créer un compte | Prévisions économiques</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
         <div class="register">
-            <h1>Register</h1>
+            <div class="auth-eyebrow"><i class="fas fa-chart-line" aria-hidden="true"></i> Prévisions économiques</div>
+            <h1>Créer un compte</h1>
+            <p class="auth-intro">Rejoignez la plateforme pour explorer les analyses économiques du Cameroun.</p>
             <div class="links">
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('register') }}" class="active">Register</a>
+                <a href="{{ url_for('login') }}">Connexion</a>
+                <a href="{{ url_for('register') }}" class="active" aria-current="page">Créer un compte</a>
             </div>
-            <form action="{{ url_for('register') }}" method="post" autocomplete="off">
+            <form action="{{ url_for('register') }}" method="post" autocomplete="on">
                 <div class="field">
                     <label for="username">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user" aria-hidden="true"></i>
+                        <span class="sr-only">Nom d’utilisateur</span>
                     </label>
-                    <input type="text" name="username" placeholder="Votre Nom" id="username" required autocomplete="off">
+                    <input type="text" name="username" placeholder="Nom d’utilisateur" id="username" required autocomplete="username">
                 </div>
 
-                <div class="field">
+                <div class="field field-password">
                     <label for="password">
-                        <i class="fas fa-lock"></i>
+                        <i class="fas fa-lock" aria-hidden="true"></i>
+                        <span class="sr-only">Mot de passe</span>
                     </label>
-                    <input type="password" name="password" placeholder="Votre mot de passe" id="password" required autocomplete="off">
+                    <input type="password" name="password" placeholder="Mot de passe" id="password" required autocomplete="new-password">
+                    <button class="password-toggle" type="button" data-password-toggle="password" aria-label="Afficher le mot de passe" aria-pressed="false">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </button>
                 </div>
 
                 <div class="field">
                     <label for="email">
-                        <i class="fas fa-envelope"></i>
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
+                        <span class="sr-only">Adresse e-mail</span>
                     </label>
-                    <input type="email" name="email" placeholder="Email" id="email" required autocomplete="off">
+                    <input type="email" name="email" placeholder="Adresse e-mail" id="email" required autocomplete="email">
                 </div>
 
-                <div class="msg">{{ msg }}</div>
-                <input type="submit" value="Register">
+                <p class="auth-note">Vos informations sont utilisées uniquement pour votre compte.</p>
+                {% if msg %}
+                <div class="msg" role="alert">{{ msg }}</div>
+                {% endif %}
+                <input type="submit" value="Créer mon compte">
             </form>
         </div>
+        <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     </body>
 </html>
